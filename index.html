@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Inventário - Goiana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-blue: #007bff;
+            --secondary-blue: #0056b3;
+            --bg-color: #f4f7f9;
+            --text-dark: #2d3436;
+            --card-bg: #ffffff;
+            --border-color: #dfe6e9;
+            --success-green: #27ae60;
+            --edit-orange: #f39c12;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); margin: 0; color: var(--text-dark); }
+
+        /* Relatório de Impressão */
+        @media print {
+            .main-header, aside, .table-controls, .acoes-col { display: none !important; }
+            body { background: white; }
+            .container { display: block; margin: 0; padding: 0; max-width: 100%; }
+            .card { box-shadow: none; border: none; padding: 0; }
+            table { width: 100%; border: 1px solid #000; font-size: 10pt; }
+            th { background-color: #eee !important; color: #000 !important; border: 1px solid #000; }
+            td { border: 1px solid #000; }
+            .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
+        }
+        .print-header { display: none; }
+
+        /* Header */
+        .main-header { background-color: var(--primary-blue); padding: 15px 0; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .header-content { max-width: 1300px; margin: 0 auto; display: flex; align-items: center; padding: 0 20px; }
+        .logo { height: 60px; filter: brightness(0) invert(1); }
+        .divider { width: 1px; height: 40px; background-color: rgba(255,255,255,0.3); margin: 0 25px; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 300; letter-spacing: 2px; margin: 0; }
+
+        /* Layout */
+        .container { max-width: 1350px; margin: 30px auto; display: grid; grid-template-columns: 380px 1fr; gap: 25px; padding: 0 20px; }
+        .card { background: var(--card-bg); border-radius: 10px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid var(--border-color); }
+        h2 { font-size: 1rem; margin-top: 0; margin-bottom: 20px; color: var(--primary-blue); text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid var(--bg-color); padding-bottom: 10px; }
+
+        /* Form */
+        label { display: block; font-size: 0.75rem; font-weight: 700; color: #636e72; margin-bottom: 5px; text-transform: uppercase; }
+        .form-group { margin-bottom: 15px; }
+        input, select, textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; transition: 0.3s; background: #fbfcfe; }
+        input:focus, select:focus { border-color: var(--primary-blue); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
+        .hidden { display: none; margin-top: 8px; border-color: var(--success-green); }
+
+        /* Buttons */
+        .btn-save { background-color: var(--primary-blue); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; font-size: 0.95rem; margin-top: 10px; transition: 0.3s; }
+        .btn-save.editing { background-color: var(--edit-orange); }
+        .btn-cancel { background-color: #b2bec3; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; margin-top: 5px; cursor: pointer; display: none; }
+
+        .btn-report { background-color: var(--success-green); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+
+        /* Table */
+        .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .search-box { width: 300px; }
+        .table-wrapper { border-radius: 8px; overflow-x: auto; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 600px; }
+        th { background-color: #f8f9fa; color: #636e72; font-size: 0.75rem; text-transform: uppercase; padding: 15px; text-align: left; }
+        td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+        
+        .badge-tipo { background: #eee; padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
+        .btn-action { border: none; background: none; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+        .edit-btn { color: var(--edit-orange); margin-right: 10px; }
+        .delete-btn { color: #eb4d4b; }
+
+        @media (max-width: 1100px) { .container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-content">
+            <img src="logo-prefeitura.png" alt="Logo Goiana" class="logo">
+            <div class="divider"></div>
+            <h1>INVENTÁRIO DE TECNOLOGIA</h1>
+        </div>
+    </header>
+
+    <div class="print-header">
+        <h2>PREFEITURA DE GOIANA - RELATÓRIO DE EQUIPAMENTOS</h2>
+        <p>Data de emissão: <span id="dataRelatorio"></span></p>
+    </div>
+
+    <main class="container">
+        <aside class="card">
+            <h2 id="formTitle">Novo Registro</h2>
+            <form id="equipamentoForm">
+                <input type="hidden" id="editId">
+                
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="tipo" onchange="checkOutros(this, 'outroTipo')" required>
+                        <option value="">Selecione...</option>
+                        <option value="Desktop">Desktop</option>
+                        <option value="Notebook">Notebook</option>
+                        <option value="Impressora">Impressora</option>
+                        <option value="Nobreak">Nobreak</option>
+                        <option value="Monitor">Monitor</option>
+                        <option value="Outros">Outros...</option>
+                    </select>
+                    <input type="text" id="outroTipo" class="hidden" placeholder="Qual equipamento?">
+                </div>
+
+                <div class="form-group">
+                    <label>Marca</label>
+                    <select id="marca" onchange="checkOutros(this, 'outraMarca')" required>
+                        <option value="">Selecione...</option>
+                        <option value="Positivo">Positivo</option>
+                        <option value="Daten">Daten</option>
+                        <option value="Dell">Dell</option>
+                        <option value="Deutell">Deutell</option>
+                        <option value="Concordia">Concordia</option>
+                        <option value="Outros">Outros...</option>
+                    </select>
+                    <input type="text" id="outraMarca" class="hidden" placeholder="Qual marca?">
+                </div>
+
+                <div class="form-group">
+                    <label>Modelo e Tombamento</label>
+                    <input type="text" id="modelo" placeholder="Modelo" required style="margin-bottom: 10px;">
+                    <input type="text" id="tombamento" placeholder="Nº Tombamento / Série" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Secretaria / Departamento</label>
+                    <select id="secretaria" onchange="checkOutros(this, 'outraSecretaria')" required>
+                        <option value="">Selecione a Secretaria...</option>
+                        <option value="AD Goiana">AD Goiana</option>
+                        <option value="Administração e Gestão de Qualidade">Administração e Gestão de Qualidade</option>
+                        <option value="Agricultura, Pesca e Meio Ambiente">Agricultura, Pesca e Meio Ambiente</option>
+                        <option value="Arrecadação e Finanças">Arrecadação e Finanças</option>
+                        <option value="Autarquia Municipal (Ensino Superior)">Autarquia Municipal do Ensino Superior</option>
+                        <option value="Comissão Permanente de Licitação">Comissão Permanente de Licitação</option>
+                        <option value="Comunicação">Comunicação</option>
+                        <option value="Controladoria">Controladoria</option>
+                        <option value="Desenvolvimento Econômico e Tecnologia">Desenvolvimento Econômico e Tecnologia</option>
+                        <option value="Educação e Inovação">Educação e Inovação</option>
+                        <option value="Gabinete do Prefeito">Gabinete do Prefeito</option>
+                        <option value="Gabinete do Vice-Prefeito">Gabinete do Vice-Prefeito</option>
+                        <option value="GoianaPrevi">GoianaPrevi</option>
+                        <option value="Planejamento Estratégico">Planejamento Estratégico</option>
+                        <option value="Políticas Sociais">Políticas Sociais</option>
+                        <option value="Procon">Procon</option>
+                        <option value="Procuradoria Geral">Procuradoria Geral do Município</option>
+                        <option value="Saúde">Saúde</option>
+                        <option value="Segurança Cidadã e Trânsito">Segurança Cidadã e Trânsito</option>
+                        <option value="Manutenção e Serviços Públicos">Manutenção e Serviços Públicos</option>
+                        <option value="Turismo">Turismo e Desenvolvimento Cultural</option>
+                        <option value="Urbanismo, Obras e Patrimônio">Urbanismo, Obras e Patrimônio</option>
+                        <option value="Distritos">Distritos</option>
+                        <option value="Mulher">Mulher</option>
+                        <option value="Articulação Política">Articulação Política</option>
+                        <option value="Esporte e Juventude">Esporte e Juventude</option>
+                        <option value="Outros">Outros...</option>
+                    </select>
+                    <input type="text" id="outraSecretaria" class="hidden" placeholder="Nome do Departamento">
+                </div>
+
+                <div class="form-group">
+                    <label>Localização e OBS</label>
+                    <input type="text" id="localizacao" placeholder="Ex: Recepção" style="margin-bottom: 10px;">
+                    <textarea id="observacao" rows="2" placeholder="OBS"></textarea>
+                </div>
+
+                <button type="submit" id="btnSubmit" class="btn-save">CADASTRAR EQUIPAMENTO</button>
+                <button type="button" id="btnCancel" class="btn-cancel" onclick="resetForm()">CANCELAR EDIÇÃO</button>
+            </form>
+        </aside>
+
+        <section class="card">
+            <div class="table-controls">
+                <h2>Itens Registrados</h2>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" placeholder="Filtrar por tombamento..." id="filtroBusca" onkeyup="filtrarTabela()" class="search-box">
+                    <button onclick="gerarRelatorio()" class="btn-report">📄 RELATÓRIO</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="tabelaMaquinas">
+                    <thead>
+                        <tr>
+                            <th>Tombamento</th>
+                            <th>Tipo</th>
+                            <th>Equipamento</th>
+                            <th>Secretaria / Local</th>
+                            <th class="acoes-col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById('equipamentoForm');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const btnCancel = document.getElementById('btnCancel');
+        const formTitle = document.getElementById('formTitle');
+        const editIdInput = document.getElementById('editId');
+        const tabela = document.querySelector('#tabelaMaquinas tbody');
+
+        // Mostra campos extras se "Outros" for selecionado
+        function checkOutros(select, inputId) {
+            const input = document.getElementById(inputId);
+            input.classList.toggle('hidden', select.value !== 'Outros');
+            if (select.value === 'Outros') input.focus();
+        }
+
+        // Carregar dados
+        document.addEventListener('DOMContentLoaded', carregarDados);
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const getVal = (id, extraId) => {
+                const sel = document.getElementById(id).value;
+                return sel === 'Outros' ? document.getElementById(extraId).value : sel;
+            };
+
+            const item = {
+                id: editIdInput.value ? parseInt(editIdInput.value) : Date.now(),
+                tipo: getVal('tipo', 'outroTipo'),
+                marca: getVal('marca', 'outraMarca'),
+                modelo: document.getElementById('modelo').value,
+                tombamento: document.getElementById('tombamento').value,
+                localizacao: document.getElementById('localizacao').value,
+                secretaria: getVal('secretaria', 'outraSecretaria'),
+                obs: document.getElementById('observacao').value
+            };
+
+            let lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
+
+            if (editIdInput.value) {
+                // Atualizar existente
+                lista = lista.map(el => el.id === item.id ? item : el);
+            } else {
+                // Adicionar novo
+                lista.push(item);
+            }
+
+            localStorage.setItem('equipamentos', JSON.stringify(lista));
+            resetForm();
+            carregarDados();
+        });
+
+        function carregarDados() {
+            tabela.innerHTML = "";
+            const lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
+            lista.forEach(item => {
+                const row = tabela.insertRow();
+                row.innerHTML = `
+                    <td><strong>${item.tombamento}</strong></td>
+                    <td><span class="badge-tipo">${item.tipo}</span></td>
+                    <td>${item.marca} ${item.modelo}</td>
+                    <td>${item.secretaria}<br><small style="color:#888">${item.localizacao}</small></td>
+                    <td class="acoes-col">
+                        <button class="btn-action edit-btn" onclick="editarItem(${item.id})">Editar</button>
+                        <button class="btn-action delete-btn" onclick="removerItem(${item.id})">Excluir</button>
+                    </td>
+                `;
+            });
+        }
+
+        function editarItem(id) {
+            const lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
+            const item = lista.find(el => el.id === id);
+            if (!item) return;
+
+            // Preencher campos
+            editIdInput.value = item.id;
+            document.getElementById('modelo').value = item.modelo;
+            document.getElementById('tombamento').value = item.tombamento;
+            document.getElementById('localizacao').value = item.localizacao;
+            document.getElementById('observacao').value = item.obs;
+
+            // Lógica para Selects e "Outros"
+            const setSelect = (id, extraId, valor, listaPadrao) => {
+                const select = document.getElementById(id);
+                if (listaPadrao.includes(valor)) {
+                    select.value = valor;
+                    document.getElementById(extraId).classList.add('hidden');
+                } else {
+                    select.value = 'Outros';
+                    const extra = document.getElementById(extraId);
+                    extra.value = valor;
+                    extra.classList.remove('hidden');
+                }
+            };
+
+            setSelect('tipo', 'outroTipo', item.tipo, ['Desktop','Notebook','Impressora','Nobreak','Monitor']);
+            setSelect('marca', 'outraMarca', item.marca, ['Positivo','Daten','Dell','Deutell','Concordia']);
+            setSelect('secretaria', 'outraSecretaria', item.secretaria, ['AD Goiana','Administração e Gestão de Qualidade','Saúde','Educação e Inovação','Gabinete do Prefeito']); // Adicione os outros aqui
+
+            // Mudar visual do botão
+            btnSubmit.innerText = "SALVAR ALTERAÇÕES";
+            btnSubmit.classList.add('editing');
+            btnCancel.style.display = "block";
+            formTitle.innerText = "Editando Registro";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            form.reset();
+            editIdInput.value = "";
+            btnSubmit.innerText = "CADASTRAR EQUIPAMENTO";
+            btnSubmit.classList.remove('editing');
+            btnCancel.style.display = "none";
+            formTitle.innerText = "Novo Registro";
+            document.querySelectorAll('.hidden').forEach(el => el.classList.add('hidden'));
+        }
+
+        function removerItem(id) {
+            if(confirm("Excluir permanentemente este item?")) {
+                let lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
+                lista = lista.filter(el => el.id !== id);
+                localStorage.setItem('equipamentos', JSON.stringify(lista));
+                carregarDados();
+            }
+        }
+
+        function filtrarTabela() {
+            const busca = document.getElementById('filtroBusca').value.toUpperCase();
+            const linhas = tabela.getElementsByTagName('tr');
+            for (let row of linhas) {
+                row.style.display = row.innerText.toUpperCase().includes(busca) ? "" : "none";
+            }
+        }
+
+        function gerarRelatorio() {
+            document.getElementById('dataRelatorio').innerText = new Date().toLocaleDateString('pt-BR');
+            window.print();
+        }
+    </script>
+</body>
+</html>
