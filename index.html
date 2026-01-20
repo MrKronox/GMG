@@ -252,6 +252,137 @@
         }
 
         @media (max-width: 1100px) { .container { grid-template-columns: 1fr; } }
+
+
+        @media (max-width: 768px) {
+
+        /* --- AJUSTE DO TOPO --- */
+        .header-content {
+            flex-direction: column; /* Logo em cima, Título embaixo */
+            gap: 12px;
+            text-align: center;
+            padding: 15px 10px;
+        }
+
+        .logo {
+            height: 50px; /* Diminui levemente a logo para ganhar espaço */
+        }
+
+        .divider {
+            display: none; /* Remove a linha vertical no celular */
+        }
+
+        .main-header h1 {
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        /* --- AJUSTE DO LAYOUT E FORMULÁRIO --- */
+        .container {
+            display: flex;
+            flex-direction: column; /* Formulário em cima da lista */
+            margin: 15px auto;
+            padding: 0 15px;
+            gap: 20px;
+        }
+
+        .card {
+            padding: 20px 15px; /* Reduz padding lateral para o formulário */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Aumenta os campos para facilitar o toque com o dedo */
+        input, select, textarea {
+            font-size: 16px !important; /* Evita que o iPhone dê zoom automático ao focar */
+            padding: 12px;
+        }
+
+        .btn-save {
+            padding: 16px; /* Botão de cadastrar maior para o polegar */
+            font-size: 1rem;
+        }
+
+        /* --- AJUSTE DOS BOTÕES DE EXPORTAR/RELATÓRIO --- */
+        .buttons-group {
+            flex-direction: column; /* Botões empilhados */
+            width: 100%;
+        }
+
+        .btn-report, .search-box {
+            width: 100% !important;
+            justify-content: center;
+        }
+
+            
+        /* Parte do código para desing das tabelas */
+
+        /* Esconde o cabeçalho original da tabela */
+        table thead { display: none; }
+
+        table, tbody, tr, td {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* O CARD (BALÃO ÚNICO) */
+        tr {
+            background: #ffffff;
+            margin-bottom: 20px;
+            border-radius: 15px; /* Cantos arredondados */
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06); /* Sombra suave */
+            border: 1px solid #eee;
+            text-align: center; /* Centraliza o texto no card */
+        }
+
+        /* Células de texto - SEM LINHAS DIVISÓRIAS */
+        td {
+            border: none !important; /* Remove qualquer linha entre os textos */
+            padding: 8px 0;
+            display: block;
+        }
+
+        /* Rótulos (Labels) que aparecem acima do texto */
+        td::before {
+            content: attr(data-label);
+            display: block; /* Faz o rótulo ficar em cima */
+            font-size: 0.7rem;
+            color: #b2bec3;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        /* Destaque para o campo de Tombamento */
+        td[data-label="Tombamento"] {
+            font-size: 1.1rem;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
+        /* Área de botões (Editar / Excluir) */
+        td.acoes-col {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f1f4f9 !important; /* Linha sutil apenas acima dos botões */
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+        }
+
+        td.acoes-col::before { display: none; } /* Remove o label "Ações" */
+
+        .btn-action {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+        }
+    }
+
+
+
     </style>
 </head>
 <body>
@@ -515,12 +646,12 @@
                     window.location.href = `detalhes.html?id=${item.id}`;
                 };
 
-                // 3. HTML Limpo (sem o link "Ver Tudo")
+                // 3. HTML com data-labels para o visual de card mobile
                 row.innerHTML = `
-                    <td><strong>${item.tombamento}</strong></td>
-                    <td><span class="badge-tipo">${item.tipo}</span></td>
-                    <td>${item.marca} ${item.modelo}</td>
-                    <td>${item.secretaria}<br><small style="color:#888">${item.localizacao}</small></td>
+                    <td data-label="Tombamento"><strong>${item.tombamento}</strong></td>
+                    <td data-label="Tipo"><span class="badge-tipo">${item.tipo}</span></td>
+                    <td data-label="Equipamento">${item.marca} ${item.modelo}</td>
+                    <td data-label="Localização">${item.secretaria}<br><small style="color:#888">${item.localizacao}</small></td>
                     <td class="acoes-col">
                         <button class="btn-action edit-btn" onclick="editarItem(${item.id})">Editar</button>
                         <button class="btn-action delete-btn" onclick="removerItem(${item.id})">Excluir</button>
