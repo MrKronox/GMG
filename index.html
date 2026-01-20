@@ -24,53 +24,232 @@
         @media print {
             .main-header, aside, .table-controls, .acoes-col { display: none !important; }
             body { background: white; }
-            .container { display: block; margin: 0; padding: 0; max-width: 100%; }
-            .card { box-shadow: none; border: none; padding: 0; }
-            table { width: 100%; border: 1px solid #000; font-size: 10pt; }
-            th { background-color: #eee !important; color: #000 !important; border: 1px solid #000; }
-            td { border: 1px solid #000; }
-            .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
+            .container { 
+                display: block; 
+                margin: 0; padding: 0; 
+                max-width: 100%; 
+            }
+            .card { 
+                box-shadow: none; 
+                border: none; 
+                padding: 0; 
+            }
+            table { 
+                width: 100%; 
+                border: 1px solid #000; 
+                font-size: 10pt; 
+            }
+            th { 
+                background-color: #eee !important; 
+                color: #000 !important; 
+                border: 1px solid #000; }
+            td { 
+                border: 1px solid #000; 
+            }
+            .print-header { 
+                display: block !important; 
+                text-align: center; 
+                margin-bottom: 20px; 
+            }
         }
         .print-header { display: none; }
 
         /* Header */
-        .main-header { background-color: var(--primary-blue); padding: 15px 0; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-        .header-content { max-width: 1300px; margin: 0 auto; display: flex; align-items: center; padding: 0 20px; }
-        .logo { height: 60px; filter: brightness(0) invert(1); }
-        .divider { width: 1px; height: 40px; background-color: rgba(255,255,255,0.3); margin: 0 25px; }
-        .main-header h1 { font-size: 1.2rem; font-weight: 300; letter-spacing: 2px; margin: 0; }
+        .main-header { 
+            background-color: var(--primary-blue); 
+            padding: 15px 0; 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            position: sticky; top: 0; 
+            z-index: 100; 
+        }
+        .header-content { 
+            max-width: 1300px; 
+            margin: 0 auto; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px; 
+        }
+        .logo { 
+            height: 60px;
+            background-color: white; /* Cria um fundo branco atrás da imagem */
+            padding: 5px;            /* Espaço entre a logo e a borda do fundo branco */
+            border-radius: 4px; 
+            }
+        .divider { 
+            width: 1px; 
+            height: 40px; 
+            background-color: rgba(255,255,255,0.3); 
+            margin: 0 25px; 
+        }
+        .main-header h1 { 
+            font-size: 1.2rem; 
+            font-weight: 300; 
+            letter-spacing: 2px; 
+            margin: 0; 
+        }
 
         /* Layout */
-        .container { max-width: 1350px; margin: 30px auto; display: grid; grid-template-columns: 380px 1fr; gap: 25px; padding: 0 20px; }
-        .card { background: var(--card-bg); border-radius: 10px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid var(--border-color); }
-        h2 { font-size: 1rem; margin-top: 0; margin-bottom: 20px; color: var(--primary-blue); text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid var(--bg-color); padding-bottom: 10px; }
+        .container { 
+            max-width: 1350px; 
+            margin: 30px auto; 
+            display: grid; 
+            grid-template-columns: 380px 1fr; 
+            gap: 25px; 
+            padding: 0 20px; 
+        }
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 10px; 
+            padding: 25px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            border: 1px solid var(--border-color); 
+        }
+        h2 { 
+            font-size: 1rem; 
+            margin-top: 0; 
+            margin-bottom: 20px; 
+            color: var(--primary-blue); 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            border-bottom: 2px solid var(--bg-color); 
+            padding-bottom: 10px; 
+        }
 
         /* Form */
-        label { display: block; font-size: 0.75rem; font-weight: 700; color: #636e72; margin-bottom: 5px; text-transform: uppercase; }
+        label { 
+            display: block; 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            color: #636e72; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+        }
         .form-group { margin-bottom: 15px; }
-        input, select, textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; transition: 0.3s; background: #fbfcfe; }
-        input:focus, select:focus { border-color: var(--primary-blue); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
-        .hidden { display: none; margin-top: 8px; border-color: var(--success-green); }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 10px 12px; 
+            border: 1.5px solid var(--border-color); 
+            border-radius: 6px; 
+            font-size: 0.9rem; 
+            transition: 0.3s; 
+            background: #fbfcfe; 
+        }
+        input:focus, select:focus { 
+            border-color: var(--primary-blue); 
+            outline: none; 
+            background: #fff; 
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1); 
+        }
+        .hidden { 
+            display: none; 
+            margin-top: 8px; 
+            border-color: var(--success-green); 
+        }
 
         /* Buttons */
-        .btn-save { background-color: var(--primary-blue); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; font-size: 0.95rem; margin-top: 10px; transition: 0.3s; }
+        .btn-save { 
+            background-color: var(--primary-blue); 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 0.95rem; 
+            margin-top: 10px; 
+            transition: 0.3s; 
+        }
         .btn-save.editing { background-color: var(--edit-orange); }
-        .btn-cancel { background-color: #b2bec3; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; margin-top: 5px; cursor: pointer; display: none; }
+        .btn-cancel { 
+            background-color: #b2bec3; 
+            color: white; 
+            border: none; 
+            padding: 10px; 
+            border-radius: 6px; 
+            width: 100%; 
+            margin-top: 5px; 
+            cursor: pointer; 
+            display: none; 
+        }
 
-        .btn-report { background-color: var(--success-green); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-report { 
+            background-color: var(--success-green); 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
 
         /* Table */
-        .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .table-controls { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }
         .search-box { width: 300px; }
-        .table-wrapper { border-radius: 8px; overflow-x: auto; border: 1px solid var(--border-color); }
-        table { width: 100%; border-collapse: collapse; background: white; min-width: 600px; }
-        th { background-color: #f8f9fa; color: #636e72; font-size: 0.75rem; text-transform: uppercase; padding: 15px; text-align: left; }
-        td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+        .table-wrapper { 
+            border-radius: 8px; 
+            overflow-x: auto; 
+            border: 1px solid var(--border-color); 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: white; 
+            min-width: 600px; 
+        }
+        th { 
+            background-color: #f8f9fa; 
+            color: #636e72; 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            padding: 15px; 
+            text-align: left; 
+        }
+        td { 
+            padding: 12px 15px; 
+            border-bottom: 1px solid var(--border-color); 
+            font-size: 0.85rem; 
+        }
         
-        .badge-tipo { background: #eee; padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
-        .btn-action { border: none; background: none; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
-        .edit-btn { color: var(--edit-orange); margin-right: 10px; }
+        .badge-tipo { 
+            background: #eee; 
+            padding: 3px 8px; 
+            border-radius: 4px; 
+            font-size: 0.7rem; 
+            font-weight: 700; 
+        }
+        .btn-action { 
+            border: none; 
+            background: none; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 0.8rem; 
+        }
+        .edit-btn { 
+            color: var(--edit-orange); 
+            margin-right: 10px; 
+        }
         .delete-btn { color: #eb4d4b; }
+
+        /* Efeito visual ao passar o mouse na linha da tabela */
+        tbody tr:hover {
+            background-color: #f1f4f9; /* Um azul bem clarinho */
+            transition: background-color 0.2s ease;
+        }
+
+        /* Opcional: destaque leve na borda ao passar o mouse */
+        tbody tr:hover td {
+            border-bottom: 1px solid var(--primary-blue);
+        }
 
         @media (max-width: 1100px) { .container { grid-template-columns: 1fr; } }
     </style>
@@ -177,13 +356,32 @@
         </aside>
 
         <section class="card">
-            <div class="table-controls">
+            <div class="table-controls" style="display: flex; flex-direction: column; gap: 15px;">
                 <h2>Itens Registrados</h2>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" placeholder="Filtrar por tombamento..." id="filtroBusca" onkeyup="filtrarTabela()" class="search-box">
-                    <button onclick="gerarRelatorio()" class="btn-report">📄 RELATÓRIO</button>
+                
+                <div class="search-container">
+                    <input type="text" placeholder="Filtrar por tombamento..." id="filtroBusca" onkeyup="filtrarTabela()" class="search-box" style="width: 100%; box-sizing: border-box;">
                 </div>
-            </div>
+
+                <div class="buttons-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 140px; position: relative;">
+                        <select id="exportOption" onchange="executarExportacao(this)" class="btn-report" style="background-color: #34495e; width: 100%; appearance: none; text-align: center; cursor: pointer;">
+                            <option value="" disabled selected>📥 EXPORTAR...</option>
+                            <option value="json">Como Backup (JSON)</option>
+                            <option value="csv">Como Planilha (Excel)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="document.getElementById('inputArquivo').click()" class="btn-report" style="background-color: #8e44ad; flex: 1; min-width: 120px;">
+                        📤 IMPORTAR
+                    </button>
+                    <input type="file" id="inputArquivo" style="display: none;" accept=".json" onchange="importarDados(event)">
+
+                    <button onclick="gerarRelatorio()" class="btn-report" style="flex: 1; min-width: 120px;">
+                        📄 RELATÓRIO
+                    </button>
+                </div>
+                
 
             <div class="table-wrapper">
                 <table id="tabelaMaquinas">
@@ -228,25 +426,68 @@
                 return sel === 'Outros' ? document.getElementById(extraId).value : sel;
             };
 
-            const item = {
-                id: editIdInput.value ? parseInt(editIdInput.value) : Date.now(),
-                tipo: getVal('tipo', 'outroTipo'),
-                marca: getVal('marca', 'outraMarca'),
-                modelo: document.getElementById('modelo').value,
-                tombamento: document.getElementById('tombamento').value,
-                localizacao: document.getElementById('localizacao').value,
-                secretaria: getVal('secretaria', 'outraSecretaria'),
-                obs: document.getElementById('observacao').value
-            };
+            // 1. Pegamos os novos valores do formulário
+            const novaSecretaria = getVal('secretaria', 'outraSecretaria');
+            const novaLocalizacao = document.getElementById('localizacao').value;
+            const dataAtual = new Date().toLocaleString('pt-BR');
 
             let lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
 
+            // 2. Verificamos se estamos EDITANDO um item que já existe
             if (editIdInput.value) {
-                // Atualizar existente
-                lista = lista.map(el => el.id === item.id ? item : el);
+                const idParaEditar = parseInt(editIdInput.value);
+        
+                lista = lista.map(itemExistente => {
+                    if (itemExistente.id === idParaEditar) {
+                
+                        // --- INÍCIO DA LÓGICA DE RASTREABILIDADE ---
+                        // Se o setor ou a sala mudaram, registramos o histórico
+                        if (itemExistente.secretaria !== novaSecretaria || itemExistente.localizacao !== novaLocalizacao) {
+                    
+                            // Se o item não tiver histórico ainda (cadastros antigos), criamos a lista
+                            if (!itemExistente.historicoMovimentacao) itemExistente.historicoMovimentacao = [];
+
+                            itemExistente.historicoMovimentacao.push({
+                                data: dataAtual,
+                                origem: `${itemExistente.secretaria} (${itemExistente.localizacao})`,
+                                destino: `${novaSecretaria} (${novaLocalizacao})`
+                            });
+                        }
+                        // --- FIM DA LÓGICA DE RASTREABILIDADE ---
+
+                        // Atualizamos o objeto com os novos dados
+                        return {
+                            ...itemExistente, // Mantém o ID e o histórico que já existia
+                            tipo: getVal('tipo', 'outroTipo'),
+                            marca: getVal('marca', 'outraMarca'),
+                            modelo: document.getElementById('modelo').value,
+                            tombamento: document.getElementById('tombamento').value,
+                            secretaria: novaSecretaria,
+                            localizacao: novaLocalizacao,
+                            obs: document.getElementById('observacao').value
+                        };
+                    }
+                    return itemExistente;
+                });
+
             } else {
-                // Adicionar novo
-                lista.push(item);
+                // 3. Se for um NOVO cadastro, criamos o histórico inicial
+                const novoItem = {
+                    id: Date.now(),
+                    tipo: getVal('tipo', 'outroTipo'),
+                    marca: getVal('marca', 'outraMarca'),
+                    modelo: document.getElementById('modelo').value,
+                    tombamento: document.getElementById('tombamento').value,
+                    localizacao: novaLocalizacao,
+                    secretaria: novaSecretaria,
+                    obs: document.getElementById('observacao').value,
+                    historicoMovimentacao: [{
+                        data: dataAtual,
+                        origem: "Cadastro Inicial",
+                        destino: `${novaSecretaria} (${novaLocalizacao})`
+                    }]
+                };
+                lista.push(novoItem);
             }
 
             localStorage.setItem('equipamentos', JSON.stringify(lista));
@@ -257,8 +498,24 @@
         function carregarDados() {
             tabela.innerHTML = "";
             const lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
+            
             lista.forEach(item => {
                 const row = tabela.insertRow();
+                
+                // 1. Torna a linha visualmente clicável
+                row.style.cursor = "pointer";
+                row.title = "Clique para ver detalhes e histórico";
+
+                // 2. Adiciona o evento de clique na linha
+                row.onclick = (e) => {
+                    // Importante: Se clicar nos botões de Editar ou Excluir, 
+                    // não deve abrir a página de detalhes.
+                    if (e.target.classList.contains('btn-action')) return;
+                    
+                    window.location.href = `detalhes.html?id=${item.id}`;
+                };
+
+                // 3. HTML Limpo (sem o link "Ver Tudo")
                 row.innerHTML = `
                     <td><strong>${item.tombamento}</strong></td>
                     <td><span class="badge-tipo">${item.tipo}</span></td>
@@ -340,6 +597,92 @@
         function gerarRelatorio() {
             document.getElementById('dataRelatorio').innerText = new Date().toLocaleDateString('pt-BR');
             window.print();
+        }
+
+        // 1. Mantenha a sua função de Importar (ela não muda)
+        function importarDados(event) {
+            const arquivo = event.target.files[0];
+            if (!arquivo) return;
+
+            const leitor = new FileReader();
+            leitor.onload = function(e) {
+                try {
+                    const dadosImportados = JSON.parse(e.target.result);
+                    if (confirm("Deseja mesclar os dados importados com os atuais?")) {
+                        const dadosAtuais = JSON.parse(localStorage.getItem('equipamentos') || '[]');
+                        const listaNova = [...dadosAtuais, ...dadosImportados];
+                        const listaFinal = Array.from(new Map(listaNova.map(item => [item.id, item])).values());
+                        
+                        localStorage.setItem('equipamentos', JSON.stringify(listaFinal));
+                        carregarDados();
+                        alert("Dados importados com sucesso!");
+                    }
+                } catch (err) {
+                    alert("Erro ao ler o arquivo.");
+                }
+            };
+            leitor.readAsText(arquivo);
+            event.target.value = '';
+        }
+
+        // 2. Mantenha a exportarDados (será usada pelo menu para o JSON)
+        function exportarDados() {
+            const dados = localStorage.getItem('equipamentos');
+            if (!dados || dados === '[]') {
+                alert("Não há dados para exportar.");
+                return;
+            }
+            const blob = new Blob([dados], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `backup_inventario_${new Date().toLocaleDateString().replace(/\//g, '-')}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 3. ADICIONE: Função para Exportar em Excel (CSV)
+        function exportarParaExcel() {
+            const dados = JSON.parse(localStorage.getItem('equipamentos') || '[]');
+            if (dados.length === 0) {
+                alert("Não há dados para exportar.");
+                return;
+            }
+
+            let csvContent = "\uFEFF"; 
+            csvContent += "Tombamento;Tipo;Marca;Modelo;Secretaria;Localizacao;Observacoes\n";
+
+            dados.forEach(item => {
+                const linha = [
+                    item.tombamento,
+                    item.tipo,
+                    item.marca,
+                    item.modelo,
+                    item.secretaria,
+                    item.localizacao,
+                    item.obs ? item.obs.replace(/\n/g, " ") : ""
+                ].join(";");
+                csvContent += linha + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `planilha_inventario_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 4. ADICIONE: O "Cérebro" do botão (executa a escolha do Select)
+        function executarExportacao(selectElement) {
+            const opcao = selectElement.value;
+            if (opcao === 'json') {
+                exportarDados();
+            } else if (opcao === 'csv') {
+                exportarParaExcel();
+            }
+            selectElement.value = ""; // Volta o botão para o texto inicial "EXPORTAR..."
         }
     </script>
 </body>
