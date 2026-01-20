@@ -136,12 +136,16 @@
         .form-group { margin-bottom: 15px; }
         input, select, textarea { 
             width: 100%; 
-            padding: 10px 12px; 
+            padding: 12px; 
             border: 1.5px solid var(--border-color); 
             border-radius: 6px; 
-            font-size: 0.9rem; 
+            font-size: 1rem; 
             transition: 0.3s; 
             background: #fbfcfe; 
+            /* A linha abaixo é a mais importante: */
+            box-sizing: border-box; 
+            display: block;
+            margin-bottom: 10px;
         }
         input:focus, select:focus { 
             border-color: var(--primary-blue); 
@@ -287,6 +291,8 @@
 
         /* --- AJUSTE DO LAYOUT E FORMULÁRIO --- */
         .container {
+            width: 100%;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column; /* Formulário em cima da lista */
             margin: 15px auto;
@@ -295,6 +301,7 @@
         }
 
         .card {
+            overflow: hidden;
             padding: 20px 15px; /* Reduz padding lateral para o formulário */
             width: 100%;
             box-sizing: border-box;
@@ -304,6 +311,7 @@
         input, select, textarea {
             font-size: 16px !important; /* Evita que o iPhone dê zoom automático ao focar */
             padding: 12px;
+            height: 48px;
         }
 
         .btn-save {
