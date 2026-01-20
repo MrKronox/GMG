@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Termo de Movimentação e Devolução</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.4; padding: 30px; color: #333; font-size: 12pt; }
+        .header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px; }
+        .logo { max-width: 120px; height: auto; margin-bottom: 10px; }
+        .titulo { font-weight: bold; text-transform: uppercase; margin: 15px 0; text-align: center; background: #eee; padding: 5px; }
+        .box-dados { border: 1px solid #000; padding: 10px; margin: 15px 0; }
+        .assinaturas { display: flex; justify-content: space-between; margin-top: 40px; }
+        .campo-assinatura { border-top: 1px solid #000; width: 45%; text-align: center; padding-top: 5px; font-size: 0.85rem; }
+        .sessao-devolucao { margin-top: 40px; border-top: 2px dashed #000; padding-top: 30px; }
+        .checkbox-group { margin: 15px 0; }
+        .checkbox-item { margin-bottom: 8px; }
+        @media print { .no-print { display: none; } body { padding: 0; } }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="margin-bottom: 20px;">
+        <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 4px;">🖨️ Imprimir Termo</button>
+        <button onclick="window.close()" style="padding: 10px 20px; cursor: pointer;">Fechar</button>
+    </div>
+
+    <div class="header" style="display: flex; flex-direction: column; border-bottom: 2px solid #000; margin-bottom: 15px; padding-bottom: 10px;">
+        
+        <div style="text-align: left; width: 100%;">
+            <img src="logo-prefeitura.png" alt="Logo Prefeitura de Goiana" style="max-width: 250px; height: auto; margin-bottom: 10px;">
+        </div>
+        
+        <div style="text-align: center; width: 100%;">
+            <div style="font-weight: bold; font-size: 1.2rem;">PREFEITURA MUNICIPAL DE GOIANA</div>
+            <div style="font-size: 0.9rem;">Estado de Pernambuco</div>
+            <div style="font-size: 0.9rem; font-weight: bold;">Gabinete do Prefeito - Setor de Tecnologia</div>
+        </div>
+    </div>
+
+    <p class="titulo">1. TERMO DE TRANSFERÊNCIA E RESPONSABILIDADE</p>
+    
+    <p>Autorizo a movimentação do equipamento abaixo descrito, sob responsabilidade da Secretaria de destino.</p>
+
+    <div class="box-dados">
+        <p><strong>Equipamento:</strong> <span id="item-nome"></span> | <strong>Tombamento:</strong> <span id="item-tombamento"></span></p>
+        <p><strong>Marca/Modelo:</strong> <span id="item-marca-modelo"></span></p>
+        <p><strong>Origem:</strong> _________________________________ | <strong>Destino:</strong> <span id="item-secretaria"></span></p>
+        <p><strong>Autorizado por (Secretário/Responsável):</strong> ____________________________________________</p>
+    </div>
+
+
+    <div style="font-size: 0.85rem; border: 1px solid #000; padding: 10px; margin-top: 10px;">
+            <p style="margin: 0 0 10px 0; font-weight: bold; text-align: center; text-decoration: underline;">DEVERES E OBRIGAÇÕES DO USUÁRIO</p>
+            <ul style="margin: 0; padding-left: 20px;">
+                <li>O equipamento citado é cedido a título de empréstimo, sendo de propriedade do Gabinete do Prefeito da Prefeitura Municipal de Goiana-PE;</li>
+                <li>Em situações de roubo, furto ou extravio, deverei informar imediatamente à chefia de Gabinete deste órgão e providenciar boletim de ocorrência policial e encaminhamento do mesmo a este órgão;</li>
+                <li>Em casos de danos no equipamento, deverei notificar a chefia de Gabinete deste órgão, devendo este avaliar o dano, se o mesmo pode ser reparado ou se o bem deverá ser tratado como inservível, bem como avaliar o valor a ser ressarcido;</li>
+                <li>Não sendo mais necessário seu uso, ou nas situações de desligamento deste órgão, o equipamento deverá ser devolvido à chefia de Gabinete, em perfeito estado de conservação, considerando o tempo de uso;</li>
+            </ul>
+            
+            <p style="margin: 10px 0 5px 0; font-weight: bold;">Para equipamentos de informática:</p>
+            <ul style="margin: 0; padding-left: 20px;">
+                <li>Poderá ser solicitada, a qualquer momento, a devolução temporária do equipamento para que a TI faça verificações e/ou atualizações de programas;</li>
+                <li>Poderão ser utilizados apenas sistemas ou aplicativos em conformidade com as leis brasileiras e previamente autorizados pelo Gabinete;</li>
+                <li>Nenhuma alteração no hardware do equipamento poderá ser realizada sem o envolvimento da TI.</li>
+            </ul>
+        </div>
+
+        <div class="assinaturas">
+            <div class="campo-assinatura">
+                Goiana-PE, <span id="data-atual"></span><br>
+                <strong>Responsável pela Entrega / Equipamento</strong>
+            </div>
+            <div class="campo-assinatura">
+                <br>
+                <strong>Assinatura do Responsável (Recebedor)</strong><br>
+                <small>Concordo com os termos acima</small>
+            </div>
+        </div>
+    
+
+    <div class="sessao-devolucao">
+        <p class="titulo">2. TERMO DE DEVOLUÇÃO (RECEBIMENTO)</p>
+        <p>Atestamos que o equipamento acima descrito foi devolvido em ____/____/____, nas seguintes condições:</p>
+        
+        <div class="checkbox-group">
+            <div class="checkbox-item">( &nbsp; ) Em perfeito estado de conservação e funcionamento.</div>
+            <div class="checkbox-item">( &nbsp; ) Apresentando o(s) seguinte(s) defeito(s): __________________________________________</div>
+            <div class="checkbox-item">( &nbsp; ) Faltando peças ou acessórios. Citar: ________________________________________________</div>
+        </div>
+
+        <div style="margin-top: 40px; border-top: 1px solid #000; width: 60%; margin-left: auto; margin-right: auto; text-align: center; padding-top: 5px;">
+            Responsável pelo Recebimento do Equipamento<br>
+            <small>(Nome Legível e Matrícula)</small>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        const lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
+        const item = lista.find(el => el.id == id);
+
+        if (item) {
+            document.getElementById('item-nome').innerText = item.tipo;
+            document.getElementById('item-tombamento').innerText = item.tombamento;
+            document.getElementById('item-marca-modelo').innerText = `${item.marca} / ${item.modelo}`;
+            document.getElementById('item-secretaria').innerText = item.secretaria + " (" + (item.localizacao || "") + ")";
+        }
+    </script>
+</body>
+</html>

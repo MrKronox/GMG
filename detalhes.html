@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Equipamento - Goiana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #007bff;
+            --bg-color: #f4f7f9;
+            --text-dark: #2d3436;
+            --border-color: #dfe6e9;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-color); margin: 0; padding: 20px; color: var(--text-dark); }
+        
+        .container-detalhes { max-width: 800px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        .header-detalhes { background: var(--primary-blue); color: white; padding: 30px; text-align: center; }
+        .header-detalhes h1 { margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
+        
+        .content { padding: 30px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .info-box { border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .info-box label { display: block; font-size: 0.75rem; font-weight: 700; color: #636e72; text-transform: uppercase; margin-bottom: 5px; }
+        .info-box span { font-size: 1.1rem; color: #2d3436; font-weight: 500; }
+        
+        .full-width { grid-column: span 2; }
+        
+        .obs-box { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid var(--primary-blue); margin-top: 20px; }
+        
+        .footer-btns { display: flex; gap: 10px; margin-top: 30px; }
+        .btn { flex: 1; padding: 15px; border-radius: 8px; text-align: center; text-decoration: none; font-weight: 600; cursor: pointer; border: none; }
+        .btn-voltar { background: #eee; color: #555; }
+        .btn-print { background: var(--primary-blue); color: white; }
+
+        /* Estilo da Linha do Tempo de Movimentação */
+        .timeline {
+            margin-top: 15px;
+            border-left: 3px solid var(--primary-blue);
+            padding-left: 20px;
+            margin-left: 10px;
+        }
+
+        .timeline-item {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* O pontinho azul na linha */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -28px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .timeline-date {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #636e72;
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            border: 1px solid #eee;
+        }
+
+        .mov-label {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
+        @media print { .btn { display: none; } body { padding: 0; } .container-detalhes { box-shadow: none; border: 1px solid #000; } }
+    </style>
+</head>
+<body>
+
+    <div class="container-detalhes">
+        <div class="header-detalhes">
+            <h1 id="det-tombamento">Carregando...</h1>
+            <p>Ficha Completa do Equipamento</p>
+        </div>
+
+        <div class="content">
+            <div class="info-grid">
+                <div class="info-box">
+                    <label>Tipo de Equipamento</label>
+                    <span id="det-tipo">-</span>
+                </div>
+                <div class="info-box">
+                    <label>Marca / Fabricante</label>
+                    <span id="det-marca">-</span>
+                </div>
+                <div class="info-box">
+                    <label>Modelo</label>
+                    <span id="det-modelo">-</span>
+                </div>
+                <div class="info-box">
+                    <label>Secretaria / Departamento</label>
+                    <span id="det-secretaria">-</span>
+                </div>
+                <div class="info-box full-width">
+                    <label>Localização Específica</label>
+                    <span id="det-localizacao">-</span>
+                </div>
+                <div class="info-box full-width">
+                    <label>Observações e Histórico</label>
+                    <div class="obs-box" id="det-obs">Nenhuma observação registrada.</div>
+                </div>
+            </div>
+
+            <div class="info-box full-width" style="margin-top: 25px;">
+                <label>Histórico de Movimentações (Rastreabilidade)</label>
+                <div id="lista-movimentacao" class="timeline">
+                    <p style="color: #888; font-size: 0.9rem;">Nenhuma movimentação registada ainda.</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button onclick="gerarTermo()" class="btn-report" style="background-color: #27ae60; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                    📄 Gerar Termo de Entrega
+                </button>
+            </div>
+
+            <div class="footer-btns">
+                <a href="index.html" class="btn btn-voltar">Voltar à Lista</a>
+                <button onclick="window.print()" class="btn btn-print">Imprimir Ficha</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+            // 1. Pegamos o ID da URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const idEquipamento = urlParams.get('id');
+
+            if (idEquipamento) {
+                const lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
+                const item = lista.find(d => d.id == idEquipamento);
+
+                if (item) {
+                    // 2. Preenchemos as informações básicas (o que você já tinha)
+                    document.getElementById('det-tombamento').innerText = "Tombamento: " + item.tombamento;
+                    document.getElementById('det-tipo').innerText = item.tipo;
+                    document.getElementById('det-marca').innerText = item.marca;
+                    document.getElementById('det-modelo').innerText = item.modelo;
+                    document.getElementById('det-secretaria').innerText = item.secretaria;
+                    document.getElementById('det-localizacao').innerText = item.localizacao || "Não informada";
+                    document.getElementById('det-obs').innerText = item.obs || "Sem observações adicionais.";
+
+                    // 3. NOVA LÓGICA: Preencher a Linha do Tempo de Movimentação
+                    const containerMov = document.getElementById('lista-movimentacao');
+                    
+                    if (item.historicoMovimentacao && item.historicoMovimentacao.length > 0) {
+                        // Limpa o texto padrão de "Nenhuma movimentação"
+                        containerMov.innerHTML = ""; 
+
+                        // Usamos o .slice().reverse() para mostrar a mudança mais RECENTE no topo da lista
+                        item.historicoMovimentacao.slice().reverse().forEach(mov => {
+                            const divItem = document.createElement('div');
+                            divItem.className = 'timeline-item';
+                            
+                            divItem.innerHTML = `
+                                <span class="timeline-date">${mov.data}</span>
+                                <div class="timeline-content">
+                                    <div><span class="mov-label">Origem:</span> ${mov.origem}</div>
+                                    <div><span class="mov-label">Destino:</span> ${mov.destino}</div>
+                                </div>
+                            `;
+                            containerMov.appendChild(divItem);
+                        });
+                    }
+                } else {
+                    alert("Equipamento não encontrado!");
+                    window.location.href = 'index.html';
+                }
+            }
+
+            // Adicione esta função no <script> do detalhes.html
+            function gerarTermo() {
+                window.open(`termo.html?id=${idEquipamento}`, '_blank');
+            }
+</script>
+</body>
+</html>
