@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
     <title>Sistema de Inventário - Goiana</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
@@ -18,7 +18,15 @@
             --edit-orange: #f39c12;
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); margin: 0; color: var(--text-dark); }
+        body,html { 
+            max-width: 100%;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-color); 
+            margin: 0;
+            padding: 0;
+            color: var(--text-dark);
+        }
 
         /* Relatório de Impressão */
         @media print {
@@ -665,7 +673,7 @@
             const item = lista.find(el => el.id === id);
             if (!item) return;
 
-            // Preencher campos
+            // Preencher campos de texto
             editIdInput.value = item.id;
             document.getElementById('modelo').value = item.modelo;
             document.getElementById('tombamento').value = item.tombamento;
@@ -675,22 +683,40 @@
             // Lógica para Selects e "Outros"
             const setSelect = (id, extraId, valor, listaPadrao) => {
                 const select = document.getElementById(id);
-                if (listaPadrao.includes(valor)) {
-                    select.value = valor;
-                    document.getElementById(extraId).classList.add('hidden');
+                const extraInput = document.getElementById(extraId);
+                
+                // Compara o valor ignorando espaços extras no início/fim
+                if (listaPadrao.includes(valor.trim())) {
+                    select.value = valor.trim();
+                    extraInput.classList.add('hidden');
+                    extraInput.value = "";
                 } else {
                     select.value = 'Outros';
-                    const extra = document.getElementById(extraId);
-                    extra.value = valor;
-                    extra.classList.remove('hidden');
+                    extraInput.value = valor;
+                    extraInput.classList.remove('hidden');
                 }
             };
 
-            setSelect('tipo', 'outroTipo', item.tipo, ['Desktop','Notebook','Impressora','Nobreak','Monitor']);
-            setSelect('marca', 'outraMarca', item.marca, ['Positivo','Daten','Dell','Deutell','Concordia']);
-            setSelect('secretaria', 'outraSecretaria', item.secretaria, ['AD Goiana','Administração e Gestão de Qualidade','Saúde','Educação e Inovação','Gabinete do Prefeito']); // Adicione os outros aqui
+            // Listas extraídas do seu HTML oficial
+            const tiposPadrao = ['Desktop', 'Notebook', 'Impressora', 'Nobreak', 'Monitor'];
+            const marcasPadrao = ['Positivo', 'Daten', 'Dell', 'Deutell', 'Concordia'];
+            
+            // Lista completa de Secretarias conforme o seu index.html
+            const secretariasPadrao = [
+                'AD Goiana', 'Administração e Gestão de Qualidade', 'Agricultura, Pesca e Meio Ambiente',
+                'Arrecadação e Finanças', 'Autarquia Municipal (Ensino Superior)', 'Comissão Permanente de Licitação',
+                'Comunicação', 'Controladoria', 'Desenvolvimento Econômico e Tecnologia', 'Educação e Inovação',
+                'Gabinete do Prefeito', 'Gabinete do Vice-Prefeito', 'GoianaPrevi', 'Planejamento Estratégico',
+                'Políticas Sociais', 'Procon', 'Procuradoria Geral', 'Saúde', 'Segurança Cidadã e Trânsito',
+                'Manutenção e Serviços Públicos', 'Turismo', 'Urbanismo, Obras e Patrimônio', 'Distritos',
+                'Mulher', 'Articulação Política', 'Esporte e Juventude'
+            ];
 
-            // Mudar visual do botão
+            setSelect('tipo', 'outroTipo', item.tipo, tiposPadrao);
+            setSelect('marca', 'outraMarca', item.marca, marcasPadrao);
+            setSelect('secretaria', 'outraSecretaria', item.secretaria, secretariasPadrao);
+
+            // Ajustes visuais
             btnSubmit.innerText = "SALVAR ALTERAÇÕES";
             btnSubmit.classList.add('editing');
             btnCancel.style.display = "block";
