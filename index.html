@@ -506,9 +506,16 @@
             <div class="table-controls" style="display: flex; flex-direction: column; gap: 15px;">
                 <h2>Itens Registrados</h2>
                 
-                <div class="search-container">
-                    <input type="text" placeholder="Filtrar por tombamento..." id="filtroBusca" onkeyup="filtrarTabela()" class="search-box" style="width: 100%; box-sizing: border-box;">
-                </div>
+                <div class="search-container" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" placeholder="Filtrar por tombamento ou modelo..." id="filtroBusca" onkeyup="filtrarTabela()" class="search-box" style="flex: 2; min-width: 200px;">
+
+                    <select id="filtroSecretaria" onchange="filtrarTabela()" class="search-box">
+                        <option value="">Todas as Secretarias</option>
+                        <option value="GABINETE">Gabinete</option> 
+                        <option value="SAÚDE">Saúde</option>
+                        <option value="EDUCAÇÃO">Educação</option>
+                        <option value="ADMINISTRAÇÃO">Administração</option>
+                    </select>
 
                 <div class="buttons-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <div style="flex: 1; min-width: 140px; position: relative;">
@@ -727,12 +734,30 @@
     };
 
     window.filtrarTabela = () => {
-        const busca = document.getElementById('filtroBusca').value.toUpperCase();
-        const linhas = tabela.getElementsByTagName('tr');
-        for (let row of linhas) {
-            row.style.display = row.innerText.toUpperCase().includes(busca) ? "" : "none";
+    const buscaGeral = document.getElementById('filtroBusca').value.toUpperCase();
+    const buscaSec = document.getElementById('filtroSecretaria').value.toUpperCase();
+    
+    // Pega as linhas da tabela
+    const linhas = tabela.getElementsByTagName('tr');
+
+    for (let row of linhas) {
+        // Se row.cells[3] funcionou para Saúde, manteremos o 3
+        const colSecretaria = row.cells[3] ? row.cells[3].innerText.toUpperCase().trim() : "";
+        const textoCompleto = row.innerText.toUpperCase();
+
+        const bateGeral = textoCompleto.includes(buscaGeral);
+        
+        // Lógica de "Contém": Verifica se o que foi selecionado está dentro do texto da célula
+        // Ex: "GABINETE" está dentro de "GABINETE DO PREFEITO"? Sim.
+        const bateSecretaria = buscaSec === "" || colSecretaria.includes(buscaSec);
+
+        if (bateGeral && bateSecretaria) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
         }
-    };
+    }
+};
 
     window.gerarRelatorio = () => {
         document.getElementById('dataRelatorio').innerText = new Date().toLocaleDateString('pt-BR');
