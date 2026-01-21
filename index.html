@@ -408,11 +408,26 @@
 </head>
 <body>
 
+    <div id="loginOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2d3436; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white;">
+    <img src="logo-prefeitura.png" alt="Logo" style="height: 80px; margin-bottom: 20px; background: white; padding: 10px; border-radius: 8px;">
+    <h2 style="color: white; border: none;">Acesso Restrito</h2>
+    <div style="width: 300px;">
+        <input type="password" id="senhaAcesso" placeholder="Digite a senha..." style="margin-bottom: 10px; text-align: center;"
+        onkeypress="if(event.key === 'Enter') window.verificarSenha()"
+        style="margin-bottom: 10px; text-align: center;">
+        <button onclick="verificarSenha()" class="btn-save">ENTRAR NO SISTEMA</button>
+        <p id="erroSenha" style="color: #ff7675; font-size: 0.8rem; text-align: center; margin-top: 10px; display: none;">Senha incorreta. Tente novamente.</p>
+    </div>
+</div>
+
     <header class="main-header">
         <div class="header-content">
             <img src="logo-prefeitura.png" alt="Logo Goiana" class="logo">
             <div class="divider"></div>
             <h1>INVENTÁRIO DE TECNOLOGIA</h1>
+            <button onclick="window.fazerLogout()" style="margin-left: auto; background: rgba(255,255,255,0.2); color: white; border: 1px solid white; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.3s;" onmouseover="this.style.background='white'; this.style.color='#007bff'" onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.color='white'">
+            SAIR🔒 <i class="fas fa-sign-out-alt"></i>
+    </button>
         </div>
     </header>
 
@@ -544,20 +559,24 @@
                 </div>
                 
 
-            <div class="table-wrapper">
-                <table id="tabelaMaquinas">
-                    <thead>
-                        <tr>
-                            <th>Tombamento</th>
-                            <th>Tipo</th>
-                            <th>Equipamento</th>
-                            <th>Secretaria / Local</th>
-                            <th class="acoes-col">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            <p id="contadorItens" style="font-size: 0.85rem; color: #007bff; margin-bottom: 10px; font-weight: 700; background: #e7f1ff; display: inline-block; padding: 5px 12px; border-radius: 20px;">
+    Carregando itens...
+</p>
+
+<div class="table-wrapper">
+    <table id="tabelaMaquinas">
+        <thead>
+            <tr>
+                <th>Tombamento</th>
+                <th>Tipo</th>
+                <th>Equipamento</th>
+                <th>Secretaria / Local</th>
+                <th class="acoes-col">Ações</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
         </section>
     </main>
 
@@ -594,31 +613,39 @@
 
     // --- FUNÇÃO: CARREGAR DADOS (Sincronização Automática) ---
     onValue(dbRef, (snapshot) => {
-        tabela.innerHTML = "";
-        const data = snapshot.val();
-        if (data) {
-            Object.keys(data).forEach(id => {
-                const item = data[id];
-                const row = tabela.insertRow();
-                row.style.cursor = "pointer";
-                row.onclick = (e) => {
-                    if (e.target.tagName === 'BUTTON') return;
-                    window.location.href = `detalhes.html?id=${id}`;
-                };
+    tabela.innerHTML = "";
+    const data = snapshot.val();
+    if (data) {
+        Object.keys(data).forEach(id => {
+            const item = data[id];
+            const row = tabela.insertRow();
+            row.style.cursor = "pointer";
+            row.onclick = (e) => {
+                if (e.target.tagName === 'BUTTON') return;
+                window.location.href = `detalhes.html?id=${id}`;
+            };
 
-                row.innerHTML = `
-                    <td data-label="Tombamento"><strong>${item.tombamento}</strong></td>
-                    <td data-label="Tipo"><span class="badge-tipo">${item.tipo}</span></td>
-                    <td data-label="Equipamento">${item.marca} ${item.modelo}</td>
-                    <td data-label="Localização">${item.secretaria}<br><small>${item.localizacao}</small></td>
-                    <td class="acoes-col">
-                        <button class="btn-action edit-btn" onclick="editarItem('${id}')">Editar</button>
-                        <button class="btn-action delete-btn" onclick="removerItem('${id}')">Excluir</button>
-                    </td>
-                `;
-            });
-        }
-    });
+            row.innerHTML = `
+                <td data-label="Tombamento"><strong>${item.tombamento}</strong></td>
+                <td data-label="Tipo"><span class="badge-tipo">${item.tipo}</span></td>
+                <td data-label="Equipamento">${item.marca} ${item.modelo}</td>
+                <td data-label="Localização">${item.secretaria}<br><small>${item.localizacao}</small></td>
+                <td class="acoes-col">
+                    <button class="btn-action edit-btn" onclick="editarItem('${id}')">Editar</button>
+                    <button class="btn-action delete-btn" onclick="removerItem('${id}')">Excluir</button>
+                </td>
+            `;
+        });
+
+        // --- LINHA ADICIONADA: Atualiza o contador e aplica filtros ativos ---
+        if (window.filtrarTabela) window.filtrarTabela(); 
+        
+    } else {
+        // Caso o banco esteja vazio
+        const contador = document.getElementById('contadorItens');
+        if (contador) contador.innerText = "Nenhum equipamento cadastrado.";
+    }
+});
 
     // --- FUNÇÃO: SALVAR / ATUALIZAR ---
     form.addEventListener('submit', async (e) => {
@@ -743,25 +770,40 @@
     window.filtrarTabela = () => {
     const buscaGeral = document.getElementById('filtroBusca').value.toUpperCase();
     const buscaSec = document.getElementById('filtroSecretaria').value.toUpperCase();
+    const contadorTexto = document.getElementById('contadorItens'); // Pega o elemento do contador
     
     // Pega as linhas da tabela
     const linhas = tabela.getElementsByTagName('tr');
 
+    let itensVisiveis = 0;
+    let totalItens = linhas.length;
+
     for (let row of linhas) {
-        // Se row.cells[3] funcionou para Saúde, manteremos o 3
         const colSecretaria = row.cells[3] ? row.cells[3].innerText.toUpperCase().trim() : "";
         const textoCompleto = row.innerText.toUpperCase();
 
         const bateGeral = textoCompleto.includes(buscaGeral);
-        
-        // Lógica de "Contém": Verifica se o que foi selecionado está dentro do texto da célula
-        // Ex: "GABINETE" está dentro de "GABINETE DO PREFEITO"? Sim.
         const bateSecretaria = buscaSec === "" || colSecretaria.includes(buscaSec);
 
         if (bateGeral && bateSecretaria) {
             row.style.display = "";
+            itensVisiveis++; // Soma se estiver visível
         } else {
             row.style.display = "none";
+        }
+    }
+
+    // --- LOGICA QUE ATUALIZA O TEXTO NA TELA ---
+    if (contadorTexto) {
+        if (totalItens === 0) {
+            contadorTexto.innerText = "Nenhum item registrado";
+            contadorTexto.style.background = "#fab1a0"; // Cor rosada para vazio
+        } else if (buscaGeral === "" && buscaSec === "") {
+            contadorTexto.innerText = `Total: ${totalItens} equipamentos registrados`;
+            contadorTexto.style.background = "#e7f1ff"; // Azul claro padrão
+        } else {
+            contadorTexto.innerText = `Filtrado: ${itensVisiveis} de ${totalItens} itens encontrados`;
+            contadorTexto.style.background = "#fff3cd"; // Amarelo para filtro ativo
         }
     }
 };
@@ -790,34 +832,121 @@
     };
 
     window.executarExportacao = (select) => {
-        onValue(dbRef, (snapshot) => {
-            const data = snapshot.val();
-            if (!data) return alert("Sem dados.");
-            const lista = Object.values(data);
-            
-            if (select.value === 'json') {
-                const blob = new Blob([JSON.stringify(lista)], { type: 'application/json' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = "backup_firebase.json";
-                link.click();
-            } else if (select.value === 'csv') {
-                let csv = "\uFEFFTombamento;Tipo;Marca;Modelo;Secretaria;Localizacao\n";
-                lista.forEach(i => csv += `${i.tombamento};${i.tipo};${i.marca};${i.modelo};${i.secretaria};${i.localizacao}\n`);
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = "planilha_firebase.csv";
-                link.click();
-            }
-            select.value = "";
-        }, { onlyOnce: true });
-    };
+    // 1. Obtém todas as linhas do corpo da tabela
+    const linhas = Array.from(tabela.querySelectorAll('tr'));
+    
+    // 2. Filtra apenas as linhas que estão sendo exibidas (display diferente de 'none')
+    const linhasVisiveis = linhas.filter(row => row.style.display !== 'none');
+
+    if (linhasVisiveis.length === 0) {
+        alert("Não há dados visíveis para exportar com o filtro atual.");
+        select.value = "";
+        return;
+    }
+
+    // 3. Mapeia os dados das células da tabela para uma lista de objetos
+    const listaFiltrada = linhasVisiveis.map(row => {
+        return {
+            tombamento: row.cells[0].innerText.trim(),
+            tipo: row.cells[1].innerText.trim(),
+            // Separamos marca/modelo se estiverem na mesma célula (cell[2])
+            equipamento: row.cells[2].innerText.trim(),
+            // A localização geralmente tem Secretaria + Localização (cell[3])
+            localizacaoCompleta: row.cells[3].innerText.replace(/\n/g, " - ").trim()
+        };
+    });
+
+    const dataArquivo = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+
+    // --- EXPORTAÇÃO JSON ---
+    if (select.value === 'json') {
+        const blob = new Blob([JSON.stringify(listaFiltrada, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `inventario_filtrado_${dataArquivo}.json`;
+        link.click();
+    } 
+    
+    // --- EXPORTAÇÃO CSV (EXCEL) ---
+    else if (select.value === 'csv') {
+        // Cabeçalho ajustado para o que a tabela exibe
+        let csv = "\uFEFFTombamento;Tipo;Equipamento;Localizacao\n";
+        
+        listaFiltrada.forEach(i => {
+            csv += `${i.tombamento};${i.tipo};${i.equipamento};${i.localizacaoCompleta}\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `planilha_filtrada_${dataArquivo}.csv`;
+        link.click();
+    }
+
+    // Reseta o select para a posição inicial
+    select.value = "";
+};
 
     window.checkOutros = (select, inputId) => {
         const input = document.getElementById(inputId);
         input.classList.toggle('hidden', select.value !== 'Outros');
     };
+
+    
+   const SENHA_MESTRA = "1234"; 
+
+    // Tornamos a função GLOBAL para o HTML conseguir enxergar
+    window.verificarSenha = () => {
+        const senhaDigitada = document.getElementById('senhaAcesso').value;
+        const overlay = document.getElementById('loginOverlay');
+        const erroMsg = document.getElementById('erroSenha');
+
+        if (senhaDigitada === SENHA_MESTRA) {
+            overlay.style.transition = "opacity 0.5s ease";
+            overlay.style.opacity = "0";
+            setTimeout(() => {
+                overlay.style.display = "none";
+            }, 500);
+            sessionStorage.setItem('autenticado', 'true');
+        } else {
+            erroMsg.style.display = "block";
+            document.getElementById('senhaAcesso').value = "";
+        }
+    };
+
+    // Nova função de verificação automática
+    const checarLogin = () => {
+        if (sessionStorage.getItem('autenticado') === 'true') {
+            const overlay = document.getElementById('loginOverlay');
+            if (overlay) overlay.style.display = "none";
+        }
+    };
+
+    // Em vez de usar window.onload (que pode ser sobrescrito), usamos o addEventListener
+    window.addEventListener('load', checarLogin);
+
+
+// --- FUNÇÃO DE LOGOUT ---
+window.fazerLogout = () => {
+    if (confirm("Deseja realmente sair do sistema?")) {
+        // Limpa a autenticação da sessão
+        sessionStorage.removeItem('autenticado');
+        
+        // Faz a tela de login aparecer novamente
+        const overlay = document.getElementById('loginOverlay');
+        if (overlay) {
+            overlay.style.display = "flex";
+            overlay.style.opacity = "1";
+            
+            // Limpa o campo de senha e coloca o foco nele
+            const campoSenha = document.getElementById('senhaAcesso');
+            if (campoSenha) {
+                campoSenha.value = "";
+                campoSenha.focus();
+            }
+        }
+    }
+};
 
     // Inicializa o clique do botão cancelar
     btnCancel.onclick = window.resetForm;
