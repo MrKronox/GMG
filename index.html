@@ -547,308 +547,213 @@
         </section>
     </main>
 
-    <script>
-        const form = document.getElementById('equipamentoForm');
-        const btnSubmit = document.getElementById('btnSubmit');
-        const btnCancel = document.getElementById('btnCancel');
-        const formTitle = document.getElementById('formTitle');
-        const editIdInput = document.getElementById('editId');
-        const tabela = document.querySelector('#tabelaMaquinas tbody');
+    <script type="module">
+    // 1. IMPORTAÇÕES DO FIREBASE
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove, update, set } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Mostra campos extras se "Outros" for selecionado
-        function checkOutros(select, inputId) {
-            const input = document.getElementById(inputId);
-            input.classList.toggle('hidden', select.value !== 'Outros');
-            if (select.value === 'Outros') input.focus();
-        }
+    const firebaseConfig = {
+        apiKey: "AIzaSyB7kGKWnj0EeQyPLhFmYE0Otju-AVgOs7U",
+        authDomain: "gerenciamento-maquinas-goiana.firebaseapp.com",
+        databaseURL: "https://gerenciamento-maquinas-goiana-default-rtdb.firebaseio.com",
+        projectId: "gerenciamento-maquinas-goiana",
+        storageBucket: "gerenciamento-maquinas-goiana.firebasestorage.app",
+        messagingSenderId: "532766971298",
+        appId: "1:532766971298:web:d04d1e40d0d349a7a48efb"
+    };
 
-        // Carregar dados
-        document.addEventListener('DOMContentLoaded', carregarDados);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, 'equipamentos');
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+    // Limpeza automática do localStorage antigo
+    localStorage.removeItem('equipamentos');
 
-            const getVal = (id, extraId) => {
-                const sel = document.getElementById(id).value;
-                return sel === 'Outros' ? document.getElementById(extraId).value : sel;
-            };
+    // Referências do DOM
+    const form = document.getElementById('equipamentoForm');
+    const tabela = document.querySelector('#tabelaMaquinas tbody');
+    const editIdInput = document.getElementById('editId');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const btnCancel = document.getElementById('btnCancel');
+    const formTitle = document.getElementById('formTitle');
 
-            // 1. Pegamos os novos valores do formulário
-            const novaSecretaria = getVal('secretaria', 'outraSecretaria');
-            const novaLocalizacao = document.getElementById('localizacao').value;
-            const dataAtual = new Date().toLocaleString('pt-BR');
-
-            let lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
-
-            // 2. Verificamos se estamos EDITANDO um item que já existe
-            if (editIdInput.value) {
-                const idParaEditar = parseInt(editIdInput.value);
-        
-                lista = lista.map(itemExistente => {
-                    if (itemExistente.id === idParaEditar) {
-                
-                        // --- INÍCIO DA LÓGICA DE RASTREABILIDADE ---
-                        // Se o setor ou a sala mudaram, registramos o histórico
-                        if (itemExistente.secretaria !== novaSecretaria || itemExistente.localizacao !== novaLocalizacao) {
-                    
-                            // Se o item não tiver histórico ainda (cadastros antigos), criamos a lista
-                            if (!itemExistente.historicoMovimentacao) itemExistente.historicoMovimentacao = [];
-
-                            itemExistente.historicoMovimentacao.push({
-                                data: dataAtual,
-                                origem: `${itemExistente.secretaria} (${itemExistente.localizacao})`,
-                                destino: `${novaSecretaria} (${novaLocalizacao})`
-                            });
-                        }
-                        // --- FIM DA LÓGICA DE RASTREABILIDADE ---
-
-                        // Atualizamos o objeto com os novos dados
-                        return {
-                            ...itemExistente, // Mantém o ID e o histórico que já existia
-                            tipo: getVal('tipo', 'outroTipo'),
-                            marca: getVal('marca', 'outraMarca'),
-                            modelo: document.getElementById('modelo').value,
-                            tombamento: document.getElementById('tombamento').value,
-                            secretaria: novaSecretaria,
-                            localizacao: novaLocalizacao,
-                            obs: document.getElementById('observacao').value
-                        };
-                    }
-                    return itemExistente;
-                });
-
-            } else {
-                // 3. Se for um NOVO cadastro, criamos o histórico inicial
-                const novoItem = {
-                    id: Date.now(),
-                    tipo: getVal('tipo', 'outroTipo'),
-                    marca: getVal('marca', 'outraMarca'),
-                    modelo: document.getElementById('modelo').value,
-                    tombamento: document.getElementById('tombamento').value,
-                    localizacao: novaLocalizacao,
-                    secretaria: novaSecretaria,
-                    obs: document.getElementById('observacao').value,
-                    historicoMovimentacao: [{
-                        data: dataAtual,
-                        origem: "Cadastro Inicial",
-                        destino: `${novaSecretaria} (${novaLocalizacao})`
-                    }]
-                };
-                lista.push(novoItem);
-            }
-
-            localStorage.setItem('equipamentos', JSON.stringify(lista));
-            resetForm();
-            carregarDados();
-        });
-
-        function carregarDados() {
-            tabela.innerHTML = "";
-            const lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
-            
-            lista.forEach(item => {
+    // --- FUNÇÃO: CARREGAR DADOS (Sincronização Automática) ---
+    onValue(dbRef, (snapshot) => {
+        tabela.innerHTML = "";
+        const data = snapshot.val();
+        if (data) {
+            Object.keys(data).forEach(id => {
+                const item = data[id];
                 const row = tabela.insertRow();
-                
-                // 1. Torna a linha visualmente clicável
                 row.style.cursor = "pointer";
-                row.title = "Clique para ver detalhes e histórico";
-
-                // 2. Adiciona o evento de clique na linha
                 row.onclick = (e) => {
-                    // Importante: Se clicar nos botões de Editar ou Excluir, 
-                    // não deve abrir a página de detalhes.
-                    if (e.target.classList.contains('btn-action')) return;
-                    
-                    window.location.href = `detalhes.html?id=${item.id}`;
+                    if (e.target.tagName === 'BUTTON') return;
+                    window.location.href = `detalhes.html?id=${id}`;
                 };
 
-                // 3. HTML com data-labels para o visual de card mobile
                 row.innerHTML = `
                     <td data-label="Tombamento"><strong>${item.tombamento}</strong></td>
                     <td data-label="Tipo"><span class="badge-tipo">${item.tipo}</span></td>
                     <td data-label="Equipamento">${item.marca} ${item.modelo}</td>
-                    <td data-label="Localização">${item.secretaria}<br><small style="color:#888">${item.localizacao}</small></td>
+                    <td data-label="Localização">${item.secretaria}<br><small>${item.localizacao}</small></td>
                     <td class="acoes-col">
-                        <button class="btn-action edit-btn" onclick="editarItem(${item.id})">Editar</button>
-                        <button class="btn-action delete-btn" onclick="removerItem(${item.id})">Excluir</button>
+                        <button class="btn-action edit-btn" onclick="editarItem('${id}')">Editar</button>
+                        <button class="btn-action delete-btn" onclick="removerItem('${id}')">Excluir</button>
                     </td>
                 `;
             });
         }
+    });
 
-        function editarItem(id) {
-            const lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
-            const item = lista.find(el => el.id === id);
+    // --- FUNÇÃO: SALVAR / ATUALIZAR ---
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = editIdInput.value;
+        const dataAtual = new Date().toLocaleString('pt-BR');
+
+        const getVal = (id, extraId) => {
+            const sel = document.getElementById(id).value;
+            return sel === 'Outros' ? document.getElementById(extraId).value : sel;
+        };
+
+        const dados = {
+            tipo: getVal('tipo', 'outroTipo'),
+            marca: getVal('marca', 'outraMarca'),
+            modelo: document.getElementById('modelo').value,
+            tombamento: document.getElementById('tombamento').value,
+            secretaria: getVal('secretaria', 'outraSecretaria'),
+            localizacao: document.getElementById('localizacao').value,
+            obs: document.getElementById('observacao').value
+        };
+
+        if (id) {
+            await update(ref(db, `equipamentos/${id}`), { ...dados, dataEdicao: dataAtual });
+        } else {
+            dados.historicoMovimentacao = [{ data: dataAtual, origem: "Cadastro Inicial", destino: `${dados.secretaria} (${dados.localizacao})` }];
+            await push(dbRef, dados);
+        }
+        window.resetForm();
+    });
+
+    // --- TORNANDO AS FUNÇÕES ACESSÍVEIS AO HTML (Escopo Global) ---
+    
+    window.editarItem = (id) => {
+        onValue(ref(db, `equipamentos/${id}`), (snapshot) => {
+            const item = snapshot.val();
             if (!item) return;
-
-            // Preencher campos de texto
-            editIdInput.value = item.id;
+            editIdInput.value = id;
             document.getElementById('modelo').value = item.modelo;
             document.getElementById('tombamento').value = item.tombamento;
             document.getElementById('localizacao').value = item.localizacao;
             document.getElementById('observacao').value = item.obs;
-
-            // Lógica para Selects e "Outros"
-            const setSelect = (id, extraId, valor, listaPadrao) => {
-                const select = document.getElementById(id);
-                const extraInput = document.getElementById(extraId);
-                
-                // Compara o valor ignorando espaços extras no início/fim
-                if (listaPadrao.includes(valor.trim())) {
-                    select.value = valor.trim();
-                    extraInput.classList.add('hidden');
-                    extraInput.value = "";
+            
+            // Lógica para marcar os selects corretamente (Tipo, Marca, Secretaria)
+            const tratarSelect = (selectId, extraId, valor) => {
+                const sel = document.getElementById(selectId);
+                const options = Array.from(sel.options).map(o => o.value);
+                if (options.includes(valor)) {
+                    sel.value = valor;
+                    document.getElementById(extraId).classList.add('hidden');
                 } else {
-                    select.value = 'Outros';
-                    extraInput.value = valor;
-                    extraInput.classList.remove('hidden');
+                    sel.value = 'Outros';
+                    document.getElementById(extraId).value = valor;
+                    document.getElementById(extraId).classList.remove('hidden');
                 }
             };
+            tratarSelect('tipo', 'outroTipo', item.tipo);
+            tratarSelect('marca', 'outraMarca', item.marca);
+            tratarSelect('secretaria', 'outraSecretaria', item.secretaria);
 
-            // Listas extraídas do seu HTML oficial
-            const tiposPadrao = ['Desktop', 'Notebook', 'Impressora', 'Nobreak', 'Monitor'];
-            const marcasPadrao = ['Positivo', 'Daten', 'Dell', 'Deutell', 'Concordia'];
-            
-            // Lista completa de Secretarias conforme o seu index.html
-            const secretariasPadrao = [
-                'AD Goiana', 'Administração e Gestão de Qualidade', 'Agricultura, Pesca e Meio Ambiente',
-                'Arrecadação e Finanças', 'Autarquia Municipal (Ensino Superior)', 'Comissão Permanente de Licitação',
-                'Comunicação', 'Controladoria', 'Desenvolvimento Econômico e Tecnologia', 'Educação e Inovação',
-                'Gabinete do Prefeito', 'Gabinete do Vice-Prefeito', 'GoianaPrevi', 'Planejamento Estratégico',
-                'Políticas Sociais', 'Procon', 'Procuradoria Geral', 'Saúde', 'Segurança Cidadã e Trânsito',
-                'Manutenção e Serviços Públicos', 'Turismo', 'Urbanismo, Obras e Patrimônio', 'Distritos',
-                'Mulher', 'Articulação Política', 'Esporte e Juventude'
-            ];
-
-            setSelect('tipo', 'outroTipo', item.tipo, tiposPadrao);
-            setSelect('marca', 'outraMarca', item.marca, marcasPadrao);
-            setSelect('secretaria', 'outraSecretaria', item.secretaria, secretariasPadrao);
-
-            // Ajustes visuais
             btnSubmit.innerText = "SALVAR ALTERAÇÕES";
             btnSubmit.classList.add('editing');
             btnCancel.style.display = "block";
             formTitle.innerText = "Editando Registro";
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, { onlyOnce: true });
+    };
+
+    window.removerItem = (id) => {
+        if (confirm("Excluir permanentemente do Banco de Dados?")) {
+            remove(ref(db, `equipamentos/${id}`));
         }
+    };
 
-        function resetForm() {
-            form.reset();
-            editIdInput.value = "";
-            btnSubmit.innerText = "CADASTRAR EQUIPAMENTO";
-            btnSubmit.classList.remove('editing');
-            btnCancel.style.display = "none";
-            formTitle.innerText = "Novo Registro";
-            document.querySelectorAll('.hidden').forEach(el => el.classList.add('hidden'));
+    window.resetForm = () => {
+        form.reset();
+        editIdInput.value = "";
+        btnSubmit.innerText = "CADASTRAR EQUIPAMENTO";
+        btnSubmit.classList.remove('editing');
+        btnCancel.style.display = "none";
+        formTitle.innerText = "Novo Registro";
+        document.getElementById('outroTipo').classList.add('hidden');
+        document.getElementById('outraMarca').classList.add('hidden');
+        document.getElementById('outraSecretaria').classList.add('hidden');
+    };
+
+    window.filtrarTabela = () => {
+        const busca = document.getElementById('filtroBusca').value.toUpperCase();
+        const linhas = tabela.getElementsByTagName('tr');
+        for (let row of linhas) {
+            row.style.display = row.innerText.toUpperCase().includes(busca) ? "" : "none";
         }
+    };
 
-        function removerItem(id) {
-            if(confirm("Excluir permanentemente este item?")) {
-                let lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
-                lista = lista.filter(el => el.id !== id);
-                localStorage.setItem('equipamentos', JSON.stringify(lista));
-                carregarDados();
-            }
-        }
+    window.gerarRelatorio = () => {
+        document.getElementById('dataRelatorio').innerText = new Date().toLocaleDateString('pt-BR');
+        window.print();
+    };
 
-        function filtrarTabela() {
-            const busca = document.getElementById('filtroBusca').value.toUpperCase();
-            const linhas = tabela.getElementsByTagName('tr');
-            for (let row of linhas) {
-                row.style.display = row.innerText.toUpperCase().includes(busca) ? "" : "none";
-            }
-        }
-
-        function gerarRelatorio() {
-            document.getElementById('dataRelatorio').innerText = new Date().toLocaleDateString('pt-BR');
-            window.print();
-        }
-
-        // 1. Mantenha a sua função de Importar (ela não muda)
-        function importarDados(event) {
-            const arquivo = event.target.files[0];
-            if (!arquivo) return;
-
-            const leitor = new FileReader();
-            leitor.onload = function(e) {
-                try {
-                    const dadosImportados = JSON.parse(e.target.result);
-                    if (confirm("Deseja mesclar os dados importados com os atuais?")) {
-                        const dadosAtuais = JSON.parse(localStorage.getItem('equipamentos') || '[]');
-                        const listaNova = [...dadosAtuais, ...dadosImportados];
-                        const listaFinal = Array.from(new Map(listaNova.map(item => [item.id, item])).values());
-                        
-                        localStorage.setItem('equipamentos', JSON.stringify(listaFinal));
-                        carregarDados();
-                        alert("Dados importados com sucesso!");
+    window.importarDados = (event) => {
+        const arquivo = event.target.files[0];
+        if (!arquivo) return;
+        const leitor = new FileReader();
+        leitor.onload = async (e) => {
+            try {
+                const dados = JSON.parse(e.target.result);
+                if (confirm(`Importar ${dados.length} itens para o Firebase?`)) {
+                    for (const item of dados) {
+                        await push(dbRef, item);
                     }
-                } catch (err) {
-                    alert("Erro ao ler o arquivo.");
+                    alert("Importação concluída!");
                 }
-            };
-            leitor.readAsText(arquivo);
-            event.target.value = '';
-        }
+            } catch (err) { alert("Erro ao ler arquivo."); }
+        };
+        leitor.readAsText(arquivo);
+    };
 
-        // 2. Mantenha a exportarDados (será usada pelo menu para o JSON)
-        function exportarDados() {
-            const dados = localStorage.getItem('equipamentos');
-            if (!dados || dados === '[]') {
-                alert("Não há dados para exportar.");
-                return;
+    window.executarExportacao = (select) => {
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            if (!data) return alert("Sem dados.");
+            const lista = Object.values(data);
+            
+            if (select.value === 'json') {
+                const blob = new Blob([JSON.stringify(lista)], { type: 'application/json' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = "backup_firebase.json";
+                link.click();
+            } else if (select.value === 'csv') {
+                let csv = "\uFEFFTombamento;Tipo;Marca;Modelo;Secretaria;Localizacao\n";
+                lista.forEach(i => csv += `${i.tombamento};${i.tipo};${i.marca};${i.modelo};${i.secretaria};${i.localizacao}\n`);
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = "planilha_firebase.csv";
+                link.click();
             }
-            const blob = new Blob([dados], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `backup_inventario_${new Date().toLocaleDateString().replace(/\//g, '-')}.json`;
-            link.click();
-            URL.revokeObjectURL(url);
-        }
+            select.value = "";
+        }, { onlyOnce: true });
+    };
 
-        // 3. ADICIONE: Função para Exportar em Excel (CSV)
-        function exportarParaExcel() {
-            const dados = JSON.parse(localStorage.getItem('equipamentos') || '[]');
-            if (dados.length === 0) {
-                alert("Não há dados para exportar.");
-                return;
-            }
+    window.checkOutros = (select, inputId) => {
+        const input = document.getElementById(inputId);
+        input.classList.toggle('hidden', select.value !== 'Outros');
+    };
 
-            let csvContent = "\uFEFF"; 
-            csvContent += "Tombamento;Tipo;Marca;Modelo;Secretaria;Localizacao;Observacoes\n";
-
-            dados.forEach(item => {
-                const linha = [
-                    item.tombamento,
-                    item.tipo,
-                    item.marca,
-                    item.modelo,
-                    item.secretaria,
-                    item.localizacao,
-                    item.obs ? item.obs.replace(/\n/g, " ") : ""
-                ].join(";");
-                csvContent += linha + "\n";
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `planilha_inventario_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`;
-            link.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // 4. ADICIONE: O "Cérebro" do botão (executa a escolha do Select)
-        function executarExportacao(selectElement) {
-            const opcao = selectElement.value;
-            if (opcao === 'json') {
-                exportarDados();
-            } else if (opcao === 'csv') {
-                exportarParaExcel();
-            }
-            selectElement.value = ""; // Volta o botão para o texto inicial "EXPORTAR..."
-        }
-    </script>
+    // Inicializa o clique do botão cancelar
+    btnCancel.onclick = window.resetForm;
+</script>
 </body>
 </html>
