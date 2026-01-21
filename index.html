@@ -195,8 +195,13 @@
             font-weight: 600; 
             cursor: pointer; 
             display: flex; 
-            align-items: center; 
+            align-items: center;
+            justify-content: center;
             gap: 8px; 
+        }
+
+        .btn-report:hover {
+            filter: brightness(1.1); /* Efeito visual ao passar o mouse */
         }
 
         /* Table */
@@ -518,23 +523,24 @@
                     </select>
                 </div>
 
-                <div class="buttons-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 140px; position: relative;">
-                        <select id="exportOption" onchange="executarExportacao(this)" class="btn-report" style="background-color: #34495e; width: 100%; appearance: none; text-align: center; cursor: pointer;">
+                <div class="buttons-group" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+    
+                    <div style="flex: 1; min-width: 150px;">
+                        <select id="exportOption" onchange="executarExportacao(this)" class="btn-report" style="background-color: #34495e;">
                             <option value="" disabled selected>📥 EXPORTAR...</option>
                             <option value="json">Como Backup (JSON)</option>
                             <option value="csv">Como Planilha (Excel)</option>
                         </select>
                     </div>
 
-                    <button onclick="document.getElementById('inputArquivo').click()" class="btn-report" style="background-color: #8e44ad; flex: 1; min-width: 120px;">
-                        📤 IMPORTAR
-                    </button>
-                    <input type="file" id="inputArquivo" style="display: none;" accept=".json" onchange="importarDados(event)">
+                    <div style="flex: 1; min-width: 150px;">
+                        <select id="importOption" onchange="dispararImportacao(this)" class="btn-report" style="background-color: #8e44ad;">
+                            <option value="" disabled selected>📤 IMPORTAR...</option>
+                            <option value="arquivo">Escolher Arquivo JSON</option>
+                        </select>
+                        <input type="file" id="inputArquivo" style="display: none;" accept=".json" onchange="importarDados(event)">
+                    </div>
 
-                    <button onclick="gerarRelatorio()" class="btn-report" style="flex: 1; min-width: 120px;">
-                        📄 RELATÓRIO
-                    </button>
                 </div>
                 
 
