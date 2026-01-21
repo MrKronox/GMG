@@ -617,22 +617,57 @@
             return sel === 'Outros' ? document.getElementById(extraId).value : sel;
         };
 
+        const novaSecretaria = getVal('secretaria', 'outraSecretaria');
+        const novaLocalizacao = document.getElementById('localizacao').value;
+
         const dados = {
             tipo: getVal('tipo', 'outroTipo'),
             marca: getVal('marca', 'outraMarca'),
             modelo: document.getElementById('modelo').value,
             tombamento: document.getElementById('tombamento').value,
-            secretaria: getVal('secretaria', 'outraSecretaria'),
-            localizacao: document.getElementById('localizacao').value,
+            secretaria: novaSecretaria,
+            localizacao: novaLocalizacao,
             obs: document.getElementById('observacao').value
         };
 
         if (id) {
-            await update(ref(db, `equipamentos/${id}`), { ...dados, dataEdicao: dataAtual });
+            // --- LÓGICA DE ATUALIZAÇÃO COM HISTÓRICO ---
+            // Precisamos ler o item antes de atualizar para comparar os locais
+            const itemRef = ref(db, `equipamentos/${id}`);
+            
+            onValue(itemRef, async (snapshot) => {
+                const itemAntigo = snapshot.val();
+                if (itemAntigo) {
+                    let historicoAtualizado = itemAntigo.historicoMovimentacao || [];
+
+                    // Verifica se houve mudança de local para registrar no histórico
+                    if (itemAntigo.secretaria !== novaSecretaria || itemAntigo.localizacao !== novaLocalizacao) {
+                        historicoAtualizado.push({
+                            data: dataAtual,
+                            origem: `${itemAntigo.secretaria} (${itemAntigo.localizacao || 'Sem sala'})`,
+                            destino: `${novaSecretaria} (${novaLocalizacao || 'Sem sala'})`
+                        });
+                    }
+
+                    // Atualiza o Firebase com os novos dados + histórico preservado/atualizado
+                    await update(ref(db, `equipamentos/${id}`), { 
+                        ...dados, 
+                        dataEdicao: dataAtual,
+                        historicoMovimentacao: historicoAtualizado 
+                    });
+                }
+            }, { onlyOnce: true }); // IMPORTANTE: onlyOnce evita que o código entre em loop
+
         } else {
-            dados.historicoMovimentacao = [{ data: dataAtual, origem: "Cadastro Inicial", destino: `${dados.secretaria} (${dados.localizacao})` }];
+            // --- LÓGICA DE NOVO CADASTRO ---
+            dados.historicoMovimentacao = [{ 
+                data: dataAtual, 
+                origem: "Cadastro Inicial", 
+                destino: `${dados.secretaria} (${dados.localizacao})` 
+            }];
             await push(dbRef, dados);
         }
+
         window.resetForm();
     });
 
