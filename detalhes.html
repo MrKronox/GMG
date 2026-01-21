@@ -142,57 +142,83 @@
         </div>
     </div>
 
-    <script>
-            // 1. Pegamos o ID da URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const idEquipamento = urlParams.get('id');
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-            if (idEquipamento) {
-                const lista = JSON.parse(localStorage.getItem('equipamentos') || '[]');
-                const item = lista.find(d => d.id == idEquipamento);
+    // Suas credenciais
+    const firebaseConfig = {
+        apiKey: "AIzaSyB7kGKWnj0EeQyPLhFmYE0Otju-AVgOs7U",
+        authDomain: "gerenciamento-maquinas-goiana.firebaseapp.com",
+        databaseURL: "https://gerenciamento-maquinas-goiana-default-rtdb.firebaseio.com",
+        projectId: "gerenciamento-maquinas-goiana",
+        storageBucket: "gerenciamento-maquinas-goiana.firebasestorage.app",
+        messagingSenderId: "532766971298",
+        appId: "1:532766971298:web:d04d1e40d0d349a7a48efb"
+    };
 
-                if (item) {
-                    // 2. Preenchemos as informações básicas (o que você já tinha)
-                    document.getElementById('det-tombamento').innerText = "Tombamento: " + item.tombamento;
-                    document.getElementById('det-tipo').innerText = item.tipo;
-                    document.getElementById('det-marca').innerText = item.marca;
-                    document.getElementById('det-modelo').innerText = item.modelo;
-                    document.getElementById('det-secretaria').innerText = item.secretaria;
-                    document.getElementById('det-localizacao').innerText = item.localizacao || "Não informada";
-                    document.getElementById('det-obs').innerText = item.obs || "Sem observações adicionais.";
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-                    // 3. NOVA LÓGICA: Preencher a Linha do Tempo de Movimentação
-                    const containerMov = document.getElementById('lista-movimentacao');
-                    
-                    if (item.historicoMovimentacao && item.historicoMovimentacao.length > 0) {
-                        // Limpa o texto padrão de "Nenhuma movimentação"
-                        containerMov.innerHTML = ""; 
+    // 1. Pegamos o ID da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const idEquipamento = urlParams.get('id');
 
-                        // Usamos o .slice().reverse() para mostrar a mudança mais RECENTE no topo da lista
-                        item.historicoMovimentacao.slice().reverse().forEach(mov => {
-                            const divItem = document.createElement('div');
-                            divItem.className = 'timeline-item';
-                            
-                            divItem.innerHTML = `
-                                <span class="timeline-date">${mov.data}</span>
-                                <div class="timeline-content">
-                                    <div><span class="mov-label">Origem:</span> ${mov.origem}</div>
-                                    <div><span class="mov-label">Destino:</span> ${mov.destino}</div>
-                                </div>
-                            `;
-                            containerMov.appendChild(divItem);
-                        });
-                    }
-                } else {
-                    alert("Equipamento não encontrado!");
-                    window.location.href = 'index.html';
+    if (idEquipamento) {
+        // 2. Referência para o item específico no Firebase
+        const itemRef = ref(db, `equipamentos/${idEquipamento}`);
+
+        onValue(itemRef, (snapshot) => {
+            const item = snapshot.val();
+
+            if (item) {
+                // 3. Preenchemos as informações básicas (usando seus IDs atuais)
+                document.getElementById('det-tombamento').innerText = "Tombamento: " + (item.tombamento || 'N/A');
+                document.getElementById('det-tipo').innerText = item.tipo;
+                document.getElementById('det-marca').innerText = item.marca;
+                document.getElementById('det-modelo').innerText = item.modelo;
+                document.getElementById('det-secretaria').innerText = item.secretaria;
+                document.getElementById('det-localizacao').innerText = item.localizacao || "Não informada";
+                document.getElementById('det-obs').innerText = item.obs || "Sem observações adicionais.";
+
+                // 4. Lógica da Linha do Tempo (Movimentação)
+                const containerMov = document.getElementById('lista-movimentacao');
+                
+                if (item.historicoMovimentacao && item.historicoMovimentacao.length > 0) {
+                    containerMov.innerHTML = ""; // Limpa o "Nenhuma movimentação"
+
+                    // Inverte a ordem para mostrar o mais recente no topo
+                    [...item.historicoMovimentacao].reverse().forEach(mov => {
+                        const divItem = document.createElement('div');
+                        divItem.className = 'timeline-item';
+                        
+                        divItem.innerHTML = `
+                            <span class="timeline-date">${mov.data}</span>
+                            <div class="timeline-content">
+                                <div><span class="mov-label">Origem:</span> ${mov.origem}</div>
+                                <div><span class="mov-label">Destino:</span> ${mov.destino}</div>
+                            </div>
+                        `;
+                        containerMov.appendChild(divItem);
+                    });
                 }
+            } else {
+                alert("Equipamento não encontrado no banco de dados!");
+                window.location.href = 'index.html';
             }
+        });
+    } else {
+        window.location.href = 'index.html';
+    }
 
-            // Adicione esta função no <script> do detalhes.html
-            function gerarTermo() {
-                window.open(`termo.html?id=${idEquipamento}`, '_blank');
-            }
+    // 5. Função Gerar Termo (Exposta para o botão onclick)
+    window.gerarTermo = function() {
+        if (idEquipamento) {
+            window.open(`termo.html?id=${idEquipamento}`, '_blank');
+        } else {
+            alert("Erro ao identificar o equipamento.");
+        }
+    };
 </script>
 </body>
 </html>
