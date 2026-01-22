@@ -437,148 +437,149 @@
     </div>
 
     <main class="container">
-        <aside class="card">
-            <h2 id="formTitle">Novo Registro</h2>
-            <form id="equipamentoForm">
-                <input type="hidden" id="editId">
-                
-                <div class="form-group">
-                    <label>Tipo</label>
-                    <select id="tipo" onchange="checkOutros(this, 'outroTipo')" required>
-                        <option value="">Selecione...</option>
-                        <option value="Desktop">Desktop</option>
-                        <option value="Notebook">Notebook</option>
-                        <option value="Impressora">Impressora</option>
-                        <option value="Nobreak">Nobreak</option>
-                        <option value="Monitor">Monitor</option>
-                        <option value="Outros">Outros...</option>
+    <aside class="card">
+        <h2 id="formTitle">Novo Registro</h2>
+        <form id="equipamentoForm">
+            <input type="hidden" id="editId">
+            
+            <div class="form-group">
+                <label>Tipo</label>
+                <select id="tipo" onchange="checkOutros(this, 'outroTipo')" required>
+                    <option value="">Selecione...</option>
+                    <option value="Desktop">Desktop</option>
+                    <option value="Notebook">Notebook</option>
+                    <option value="Impressora">Impressora</option>
+                    <option value="Nobreak">Nobreak</option>
+                    <option value="Monitor">Monitor</option>
+                    <option value="Outros">Outros...</option>
+                </select>
+                <input type="text" id="outroTipo" class="hidden" placeholder="Qual equipamento?">
+            </div>
+
+            <div class="form-group">
+                <label>Marca</label>
+                <select id="marca" onchange="checkOutros(this, 'outraMarca')" required>
+                    <option value="">Selecione...</option>
+                    <option value="Positivo">Positivo</option>
+                    <option value="Daten">Daten</option>
+                    <option value="Dell">Dell</option>
+                    <option value="Deutell">Deutell</option>
+                    <option value="Concordia">Concordia</option>
+                    <option value="Outros">Outros...</option>
+                </select>
+                <input type="text" id="outraMarca" class="hidden" placeholder="Qual marca?">
+            </div>
+
+            <div class="form-group">
+                <label>Modelo e Tombamento</label>
+                <input type="text" id="modelo" placeholder="Modelo" required style="margin-bottom: 10px;">
+                <input type="text" id="tombamento" placeholder="Nº Tombamento / Série" required>
+            </div>
+
+            <div class="form-group">
+                <label>Secretaria / Departamento</label>
+                <select id="secretaria" onchange="checkOutros(this, 'outraSecretaria')" required>
+                    <option value="">Selecione a Secretaria...</option>
+                    <option value="AD Goiana">AD Goiana</option>
+                    <option value="Administração e Gestão de Qualidade">Administração e Gestão de Qualidade</option>
+                    <option value="Agricultura, Pesca e Meio Ambiente">Agricultura, Pesca e Meio Ambiente</option>
+                    <option value="Arrecadação e Finanças">Arrecadação e Finanças</option>
+                    <option value="Autarquia Municipal (Ensino Superior)">Autarquia Municipal do Ensino Superior</option>
+                    <option value="Comissão Permanente de Licitação">Comissão Permanente de Licitação</option>
+                    <option value="Comunicação">Comunicação</option>
+                    <option value="Controladoria">Controladoria</option>
+                    <option value="Desenvolvimento Econômico e Tecnologia">Desenvolvimento Econômico e Tecnologia</option>
+                    <option value="Educação e Inovação">Educação e Inovação</option>
+                    <option value="Gabinete do Prefeito">Gabinete do Prefeito</option>
+                    <option value="Gabinete do Vice-Prefeito">Gabinete do Vice-Prefeito</option>
+                    <option value="GoianaPrevi">GoianaPrevi</option>
+                    <option value="Planejamento Estratégico">Planejamento Estratégico</option>
+                    <option value="Políticas Sociais">Políticas Sociais</option>
+                    <option value="Procon">Procon</option>
+                    <option value="Procuradoria Geral">Procuradoria Geral do Município</option>
+                    <option value="Saúde">Saúde</option>
+                    <option value="Segurança Cidadã e Trânsito">Segurança Cidadã e Trânsito</option>
+                    <option value="Manutenção e Serviços Públicos">Manutenção e Serviços Públicos</option>
+                    <option value="Turismo">Turismo e Desenvolvimento Cultural</option>
+                    <option value="Urbanismo, Obras e Patrimônio">Urbanismo, Obras e Patrimônio</option>
+                    <option value="Distritos">Distritos</option>
+                    <option value="Mulher">Mulher</option>
+                    <option value="Articulação Política">Articulação Política</option>
+                    <option value="Esporte e Juventude">Esporte e Juventude</option>
+                    <option value="Outros">Outros...</option>
+                </select>
+                <input type="text" id="outraSecretaria" class="hidden" placeholder="Nome do Departamento">
+            </div>
+
+            <div class="form-group">
+                <label>Localização e OBS</label>
+                <input type="text" id="localizacao" placeholder="Ex: Recepção" style="margin-bottom: 10px;">
+                <textarea id="observacao" rows="2" placeholder="OBS"></textarea>
+            </div>
+
+            <button type="submit" id="btnSubmit" class="btn-save">CADASTRAR EQUIPAMENTO</button>
+            <button type="button" id="btnCancel" class="btn-cancel" onclick="resetForm()">CANCELAR EDIÇÃO</button>
+        </form>
+    </aside>
+
+    <section class="card">
+        <div class="table-controls" style="display: flex; flex-direction: column; gap: 15px;">
+            <h2>Itens Registrados</h2>
+            
+            <div class="search-container" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" placeholder="Filtrar por tombamento ou modelo..." id="filtroBusca" onkeyup="window.filtrarTabela()" class="search-box" style="flex: 2; min-width: 200px;">
+
+                <select id="filtroSecretaria" onchange="window.filtrarTabela()" class="search-box" style="flex: 1; min-width: 150px;">
+                    <option value="">Todas as Secretarias</option>
+                    <option value="GABINETE">Gabinete</option> 
+                    <option value="SAÚDE">Saúde</option>
+                    <option value="EDUCAÇÃO">Educação</option>
+                    <option value="LICITAÇÃO">Licitação</option>
+                    <option value="ADMINISTRAÇÃO">Administração</option>
+                </select>
+            </div>
+
+            <div class="buttons-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 150px;">
+                    <select id="exportOption" onchange="window.executarExportacao(this)" class="btn-report" style="background-color: #34495e; width: 100%;">
+                        <option value="" disabled selected>📥 EXPORTAR...</option>
+                        <option value="json">Como Backup (JSON)</option>
+                        <option value="csv">Como Planilha (Excel)</option>
                     </select>
-                    <input type="text" id="outroTipo" class="hidden" placeholder="Qual equipamento?">
                 </div>
 
-                <div class="form-group">
-                    <label>Marca</label>
-                    <select id="marca" onchange="checkOutros(this, 'outraMarca')" required>
-                        <option value="">Selecione...</option>
-                        <option value="Positivo">Positivo</option>
-                        <option value="Daten">Daten</option>
-                        <option value="Dell">Dell</option>
-                        <option value="Deutell">Deutell</option>
-                        <option value="Concordia">Concordia</option>
-                        <option value="Outros">Outros...</option>
+                <div style="flex: 1; min-width: 150px;">
+                    <select id="importOption" onchange="window.dispararImportacao(this)" class="btn-report" style="background-color: #8e44ad; width: 100%;">
+                        <option value="" disabled selected>📤 IMPORTAR...</option>
+                        <option value="arquivo">Escolher Arquivo JSON</option>
                     </select>
-                    <input type="text" id="outraMarca" class="hidden" placeholder="Qual marca?">
+                    <input type="file" id="inputArquivo" style="display: none;" accept=".json" onchange="window.importarDados(event)">
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label>Modelo e Tombamento</label>
-                    <input type="text" id="modelo" placeholder="Modelo" required style="margin-bottom: 10px;">
-                    <input type="text" id="tombamento" placeholder="Nº Tombamento / Série" required>
-                </div>
+            <div style="text-align: left; margin-top: 5px;">
+                <p id="contadorItens" style="font-size: 0.85rem; color: #007bff; margin-bottom: 0; font-weight: 700; background: #e7f1ff; display: inline-block; padding: 5px 15px; border-radius: 20px; border: 1px solid #b3d7ff;">
+                    Carregando itens...
+                </p>
+            </div>
+        </div>
 
-                <div class="form-group">
-                    <label>Secretaria / Departamento</label>
-                    <select id="secretaria" onchange="checkOutros(this, 'outraSecretaria')" required>
-                        <option value="">Selecione a Secretaria...</option>
-                        <option value="AD Goiana">AD Goiana</option>
-                        <option value="Administração e Gestão de Qualidade">Administração e Gestão de Qualidade</option>
-                        <option value="Agricultura, Pesca e Meio Ambiente">Agricultura, Pesca e Meio Ambiente</option>
-                        <option value="Arrecadação e Finanças">Arrecadação e Finanças</option>
-                        <option value="Autarquia Municipal (Ensino Superior)">Autarquia Municipal do Ensino Superior</option>
-                        <option value="Comissão Permanente de Licitação">Comissão Permanente de Licitação</option>
-                        <option value="Comunicação">Comunicação</option>
-                        <option value="Controladoria">Controladoria</option>
-                        <option value="Desenvolvimento Econômico e Tecnologia">Desenvolvimento Econômico e Tecnologia</option>
-                        <option value="Educação e Inovação">Educação e Inovação</option>
-                        <option value="Gabinete do Prefeito">Gabinete do Prefeito</option>
-                        <option value="Gabinete do Vice-Prefeito">Gabinete do Vice-Prefeito</option>
-                        <option value="GoianaPrevi">GoianaPrevi</option>
-                        <option value="Planejamento Estratégico">Planejamento Estratégico</option>
-                        <option value="Políticas Sociais">Políticas Sociais</option>
-                        <option value="Procon">Procon</option>
-                        <option value="Procuradoria Geral">Procuradoria Geral do Município</option>
-                        <option value="Saúde">Saúde</option>
-                        <option value="Segurança Cidadã e Trânsito">Segurança Cidadã e Trânsito</option>
-                        <option value="Manutenção e Serviços Públicos">Manutenção e Serviços Públicos</option>
-                        <option value="Turismo">Turismo e Desenvolvimento Cultural</option>
-                        <option value="Urbanismo, Obras e Patrimônio">Urbanismo, Obras e Patrimônio</option>
-                        <option value="Distritos">Distritos</option>
-                        <option value="Mulher">Mulher</option>
-                        <option value="Articulação Política">Articulação Política</option>
-                        <option value="Esporte e Juventude">Esporte e Juventude</option>
-                        <option value="Outros">Outros...</option>
-                    </select>
-                    <input type="text" id="outraSecretaria" class="hidden" placeholder="Nome do Departamento">
-                </div>
-
-                <div class="form-group">
-                    <label>Localização e OBS</label>
-                    <input type="text" id="localizacao" placeholder="Ex: Recepção" style="margin-bottom: 10px;">
-                    <textarea id="observacao" rows="2" placeholder="OBS"></textarea>
-                </div>
-
-                <button type="submit" id="btnSubmit" class="btn-save">CADASTRAR EQUIPAMENTO</button>
-                <button type="button" id="btnCancel" class="btn-cancel" onclick="resetForm()">CANCELAR EDIÇÃO</button>
-            </form>
-        </aside>
-
-        <section class="card">
-            <div class="table-controls" style="display: flex; flex-direction: column; gap: 15px;">
-                <h2>Itens Registrados</h2>
-                
-                <div class="search-container" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <input type="text" placeholder="Filtrar por tombamento ou modelo..." id="filtroBusca" onkeyup="filtrarTabela()" class="search-box" style="flex: 2; min-width: 200px;">
-
-                    <select id="filtroSecretaria" onchange="filtrarTabela()" class="search-box">
-                        <option value="">Todas as Secretarias</option>
-                        <option value="GABINETE">Gabinete</option> 
-                        <option value="SAÚDE">Saúde</option>
-                        <option value="EDUCAÇÃO">Educação</option>
-                        <option value="ADMINISTRAÇÃO">Administração</option>
-                    </select>
-                </div>
-
-                <div class="buttons-group" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
-    
-                    <div style="flex: 1; min-width: 150px;">
-                        <select id="exportOption" onchange="executarExportacao(this)" class="btn-report" style="background-color: #34495e;">
-                            <option value="" disabled selected>📥 EXPORTAR...</option>
-                            <option value="json">Como Backup (JSON)</option>
-                            <option value="csv">Como Planilha (Excel)</option>
-                        </select>
-                    </div>
-
-                    <div style="flex: 1; min-width: 150px;">
-                        <select id="importOption" onchange="dispararImportacao(this)" class="btn-report" style="background-color: #8e44ad;">
-                            <option value="" disabled selected>📤 IMPORTAR...</option>
-                            <option value="arquivo">Escolher Arquivo JSON</option>
-                        </select>
-                        <input type="file" id="inputArquivo" style="display: none;" accept=".json" onchange="importarDados(event)">
-                    </div>
-
-                </div>
-                
-
-            <p id="contadorItens" style="font-size: 0.85rem; color: #007bff; margin-bottom: 10px; font-weight: 700; background: #e7f1ff; display: inline-block; padding: 5px 12px; border-radius: 20px;">
-    Carregando itens...
-</p>
-
-<div class="table-wrapper">
-    <table id="tabelaMaquinas">
-        <thead>
-            <tr>
-                <th>Tombamento</th>
-                <th>Tipo</th>
-                <th>Equipamento</th>
-                <th>Secretaria / Local</th>
-                <th class="acoes-col">Ações</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
-        </section>
-    </main>
+        <div class="table-wrapper" style="margin-top: 15px;">
+            <table id="tabelaMaquinas">
+                <thead>
+                    <tr>
+                        <th>Tombamento</th>
+                        <th>Tipo</th>
+                        <th>Equipamento</th>
+                        <th>Secretaria / Local</th>
+                        <th class="acoes-col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+</main>
 
     <script type="module">
     // 1. IMPORTAÇÕES DO FIREBASE
@@ -813,20 +814,50 @@
         window.print();
     };
 
+
+    // --- FUNÇÃO PARA DISPARAR O CLIQUE NO INPUT ESCONDIDO ---
+    window.dispararImportacao = (select) => {
+        if (select.value === "arquivo") {
+            const input = document.getElementById('inputArquivo');
+            if (input) {
+                input.click();
+            }
+        }
+        select.value = ""; // Reseta o select para o texto "IMPORTAR..."
+    };
+
     window.importarDados = (event) => {
         const arquivo = event.target.files[0];
         if (!arquivo) return;
+        
         const leitor = new FileReader();
         leitor.onload = async (e) => {
             try {
                 const dados = JSON.parse(e.target.result);
+                const dataAtual = new Date().toLocaleString('pt-BR');
+
                 if (confirm(`Importar ${dados.length} itens para o Firebase?`)) {
                     for (const item of dados) {
+                        // Se o item importado não tiver histórico, criamos um padrão
+                        if (!item.historicoMovimentacao) {
+                            item.historicoMovimentacao = [{ 
+                                data: dataAtual, 
+                                origem: "Carga via Importação", 
+                                destino: `${item.secretaria || 'Não informada'} (${item.localizacao || '--'})` 
+                            }];
+                        }
+                        // Adiciona data de cadastro se não existir
+                        if (!item.dataCadastro) item.dataCadastro = dataAtual;
+
                         await push(dbRef, item);
                     }
-                    alert("Importação concluída!");
+                    alert("Importação concluída com sucesso!");
+                    event.target.value = ""; // Limpa o input de arquivo
                 }
-            } catch (err) { alert("Erro ao ler arquivo."); }
+            } catch (err) { 
+                console.error("Erro na importação:", err);
+                alert("Erro ao ler arquivo. Verifique se o formato JSON está correto."); 
+            }
         };
         leitor.readAsText(arquivo);
     };
