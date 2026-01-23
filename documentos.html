@@ -138,7 +138,16 @@
             body { background: white; }
             
             /* Estilo do Documento Oficial (Parecido com termo.html) */
-            .print-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px; }
+            .print-header { 
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between; /* Alinha no início da linha */
+                text-align: center; 
+                border-bottom: 2px solid #000; 
+                margin-bottom: 20px; 
+                padding-bottom: 10px; 
+                gap: 20px; /* Espaço entre a logo e o texto */
+            }
             .print-logo { max-width: 150px; margin-bottom: 10px; }
             .print-title { background: #eee; padding: 5px; font-weight: bold; border: 1px solid #000; text-align: center; text-transform: uppercase; }
             .box-dados { border: 1px solid #000; padding: 10px; margin: 15px 0; line-height: 1.6; }
@@ -261,6 +270,11 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Técnico Responsável</label>
+                    <input type="text" id="os_tecnico" placeholder="Nome do técnico que realizou o serviço">
+                </div>
+
+                <div class="form-group">
                     <label>Tipo do Serviço</label>
                     <select id="os_tipo_servico" onchange="checkOutros(this, 'os_servico_outro_wrap')">
                         <option value="">Selecione...</option>
@@ -290,6 +304,13 @@
                     <label>Qual Equipamento?</label>
                     <input type="text" id="os_equip_outro" placeholder="Ex: Estabilizador, Scanner...">
                 </div>
+
+                <div class="form-group">
+                    <label>Descrição do Serviço Realizado</label>
+                    <textarea id="os_desc_realizado" rows="5" placeholder="Descreva aqui o que foi feito no atendimento..."></textarea>
+                </div>
+
+
             </div>
 
             <button class="btn-print" onclick="gerarImpressao()">🖨️ IMPRIMIR DOCUMENTO</button>
@@ -299,8 +320,8 @@
     <div id="area-impressao">
         <div class="print-header">
             <img src="logo-prefeitura.png" class="print-logo">
-            <div style="font-weight: bold;">PREFEITURA MUNICIPAL DE GOIANA</div>
-            <div style="font-size: 0.8rem;">SETOR DE TECNOLOGIA DA INFORMAÇÃO</div>
+            
+            <div style="font-size: 0.8rem;">SETOR DE TECNOLOGIA DO GABINETE</div>
         </div>
 
         <div id="print-dinamico"></div>
@@ -548,15 +569,17 @@
 
             `;
         } else {
-            // 1. Coleta de dados dos novos campos do formulário
+            // 1. Coleta de dados (Incluindo o novo campo de descrição do navegador)
             const orgao = document.getElementById('os_orgao').value || '__________';
             const solicitante = document.getElementById('os_solicitante').value || '__________';
+            const tecnico = document.getElementById('os_tecnico').value || '____________________';
             
-            // Tratamento da data (converte de AAAA-MM-DD para DD/MM/AAAA)
+            // Captura o texto do balão (textarea) e preserva as quebras de linha
+            const descRealizada = document.getElementById('os_desc_realizado').value.replace(/\n/g, '<br>') || '';
+
             const dataSolRaw = document.getElementById('os_data_solicitacao').value;
             const dataSolicitacao = dataSolRaw ? dataSolRaw.split('-').reverse().join('/') : '____/____/____';
             
-            // Lógica para capturar o valor dos Selects ou o texto digitado em "Outros"
             const servicoSelect = document.getElementById('os_tipo_servico').value;
             const servico = servicoSelect === 'Outros' ? document.getElementById('os_servico_outro').value : servicoSelect;
             
@@ -575,22 +598,22 @@
                     <strong>TIPO DE EQUIPAMENTO:</strong> ${equipamento || '____________________'}
                 </div>
 
-                <div style="border: 1px solid #000; padding: 15px; margin-top: 10px;">
-                    <div style="font-size: 0.9rem; line-height: 2.2;">
-                        <strong>DATA DO ATENDIMENTO:</strong> ____/____/____<br>
-                        <strong>RESPONSÁVEL TÉCNICO:</strong> __________________________________________
+                <div style="border: 1px solid #000; padding: 15px; margin-top: 10px; min-height: 400px;">
+                    <div style="font-size: 0.9rem; line-height: 1.8;">
+                        <strong>RESPONSÁVEL TÉCNICO:</strong> ${tecnico}
                     </div>
                     
                     <div style="margin-top: 15px;">
                         <strong>DESCRIÇÃO DO SERVIÇO REALIZADO:</strong>
-                        <div style="border: 1px solid #000; height: 350px; margin-top: 10px; background-color: #fff;"></div>
-                        <i style="font-size: 0.65rem; color: #555;">(Relate detalhadamente os procedimentos realizados, peças trocadas ou softwares instalados)</i>
+                        <div style="margin-top: 10px; text-align: justify; font-size: 0.9rem; line-height: 1.4;">
+                            ${descRealizada || '<br><br><br><br>'} 
+                        </div>
                     </div>
                 </div>
 
                 <div style="margin-top: 50px;">
                     <div style="text-align: right; font-size: 0.9rem; margin-bottom: 50px;">
-                        Goiana-PE, ____/____/____
+                        Goiana-PE, ____/____/2026
                     </div>
                     
                     <div style="text-align: center;">
