@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Documentos Oficiais - TI Goiana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-blue: #007bff;
+            --secondary-blue: #0056b3;
+            --bg-color: #f4f7f9;
+            --text-dark: #2d3436;
+            --card-bg: #ffffff;
+            --border-color: #dfe6e9;
+            --success-green: #27ae60;
+        }
+
+        body, html { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-color); 
+            margin: 0;
+            padding: 0;
+            color: var(--text-dark);
+        }
+
+        /* --- DESIGN DO HEADER (IGUAL AO INDEX) --- */
+        .main-header { 
+            background-color: var(--primary-blue); 
+            padding: 15px 0; 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        }
+        .header-content { 
+            max-width: 1300px; 
+            margin: 0 auto; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px; 
+        }
+        .logo { 
+            height: 50px;
+            background-color: white;
+            padding: 5px;
+            border-radius: 4px; 
+        }
+        .divider { 
+            width: 1px; 
+            height: 35px; 
+            background-color: rgba(255,255,255,0.3); 
+            margin: 0 20px; 
+        }
+        .main-header h1 { 
+            font-size: 1.1rem; 
+            font-weight: 300; 
+            letter-spacing: 1px; 
+            margin: 0; 
+        }
+
+        /* --- CONTEÚDO DA PÁGINA --- */
+        .container { 
+            max-width: 600px; 
+            margin: 30px auto; 
+            padding: 0 20px; 
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 10px; 
+            padding: 25px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            border: 1px solid var(--border-color); 
+        }
+
+        /* Abas Estilo Index */
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #636e72;
+            transition: 0.3s;
+        }
+        .tab-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* Formulário Estilo Index */
+        .form-group { margin-bottom: 15px; }
+        label { 
+            display: block; 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            color: #636e72; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+        }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1.5px solid var(--border-color); 
+            border-radius: 6px; 
+            font-size: 1rem; 
+            background: #fbfcfe; 
+            box-sizing: border-box;
+        }
+
+        .btn-print {
+            background-color: var(--success-green); 
+            color: white; 
+            border: none; 
+            padding: 16px; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        /* --- CONFIGURAÇÃO DE IMPRESSÃO --- */
+        #area-impressao { display: none; }
+
+        @media print {
+            .main-header, .no-print { display: none !important; }
+            #area-impressao { display: flex !important; flex-direction: column; min-height: 95vh; }
+            body { background: white; }
+            
+            /* Estilo do Documento Oficial (Parecido com termo.html) */
+            .print-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px; }
+            .print-logo { max-width: 150px; margin-bottom: 10px; }
+            .print-title { background: #eee; padding: 5px; font-weight: bold; border: 1px solid #000; text-align: center; text-transform: uppercase; }
+            .box-dados { border: 1px solid #000; padding: 10px; margin: 15px 0; line-height: 1.6; }
+            .assinaturas { 
+                margin-top: auto; /* Empurra para o fim da página */
+                display: flex; 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 30px; /* Espaço entre as assinaturas */
+                padding-bottom: 30px;
+            }
+            .linha { 
+                border-top: 1px solid #000; 
+                width: 60%; /* Linha maior para assinatura */
+                text-align: center; 
+                padding-top: 5px; 
+                font-size: 0.85rem; 
+            }
+            .quebra-pagina {
+                page-break-before: always;
+                padding-top: 30px;
+            }
+            .box-devolucao {
+                border: 2px dashed #000;
+                padding: 20px;
+                margin-top: 20px;
+                line-height: 2.2; /* Aumenta o espaço para escrita manual */
+            }
+        }
+
+        /* Ajuste Mobile */
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; gap: 10px; }
+            .divider { display: none; }
+            .container { margin-top: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header no-print">
+        <div class="header-content">
+            <img src="logo-prefeitura.png" alt="Logo Goiana" class="logo">
+            <div class="divider"></div>
+            <h1>GERADOR DE DOCUMENTOS</h1>
+            <button onclick="window.location.href='index.html'" style="margin-left: auto; background: rgba(255,255,255,0.2); color: white; border: 1px solid white; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem;">
+                VOLTAR ↩
+            </button>
+        </div>
+    </header>
+
+    <main class="container no-print">
+        <div class="tab-container">
+            <button class="tab-btn active" id="btn-termo" onclick="toggleTab('termo')">TERMO DE ENTREGA</button>
+            <button class="tab-btn" id="btn-os" onclick="toggleTab('os')">ORDEM DE SERVIÇO</button>
+        </div>
+
+        <div class="card">
+            <div id="form-termo">
+                <div class="form-group">
+                    <label>Responsável Pela Solicitação</label>
+                    <input type="text" id="t_receptor" placeholder="Pessoa Solicitante">
+                </div>
+                <div class="form-group">
+                    <label>Orgão Solicitante</label>
+                    <input type="text" id="t_setor" placeholder="Secretaria Solicitante">
+                </div>
+
+                <hr style="border: 0.5px solid var(--border-color); margin: 20px 0;">
+
+                <div class="form-group">
+                    <label>Buscar por Tombamento</label>
+                    <input type="text" id="t_tombo" placeholder="Ex: 679">
+                </div>
+
+                <div class="form-group" style="display: flex; gap: 5px;">
+                    <div style="flex: 1;">
+                        <label>Item sem Tombamento / Periféricos</label>
+                        <input type="text" id="t_manual" placeholder="Ex: Mouse, Teclado, Cabo...">
+                    </div>
+                    <button onclick="adicionarManual()" style="margin-top: 18px; padding: 0 15px; background: var(--primary-blue); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.2rem;">+</button>
+                </div>
+
+                <div id="lista-equipamentos-selecionados" style="margin-top: 15px;"></div>
+
+                <div id="campos-especificacoes" style="display: none; background: #f0f7ff; padding: 15px; border-radius: 8px; border: 1px dashed var(--primary-blue); margin-top: 20px; margin-bottom: 20px;">
+                    <label style="color: var(--primary-blue); margin-bottom: 12px; display: block; font-weight: bold; font-size: 0.8rem;">⚙️ ESPECIFICAÇÕES DO COMPUTADOR</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label>Processador</label>
+                            <input type="text" id="spec_cpu" placeholder="Ex: Core i5 12th">
+                        </div>
+                        <div class="form-group">
+                            <label>Memória RAM</label>
+                            <input type="text" id="spec_ram" placeholder="Ex: 8GB DDR4">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Armazenamento (HD/SSD)</label>
+                            <input type="text" id="spec_disco" placeholder="Ex: SSD 240GB Kingston">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="form-os" style="display:none">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>Órgão Solicitante</label>
+                        <input type="text" id="os_orgao" placeholder="Ex: Secretaria de Saúde">
+                    </div>
+                    <div class="form-group">
+                        <label>Data da Solicitação</label>
+                        <input type="date" id="os_data_solicitacao">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Responsável Pela Solicitação</label>
+                    <input type="text" id="os_solicitante" placeholder="Nome de quem pediu o serviço">
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo do Serviço</label>
+                    <select id="os_tipo_servico" onchange="checkOutros(this, 'os_servico_outro_wrap')">
+                        <option value="">Selecione...</option>
+                        <option value="Manutenção Preventiva">Manutenção Preventiva</option>
+                        <option value="Instalação de Equipamentos">Instalação de Equipamentos</option>
+                        <option value="Instalação de Programas">Instalação de Programas</option>
+                        <option value="Formatação / Backup">Formatação / Backup</option>
+                        <option value="Outros">Outros (Descrever)</option>
+                    </select>
+                </div>
+                <div id="os_servico_outro_wrap" style="display:none;" class="form-group">
+                    <label>Descreva o Serviço</label>
+                    <textarea id="os_servico_outro" rows="2" placeholder="Descreva brevemente..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Equipamento</label>
+                    <select id="os_tipo_equip" onchange="checkOutros(this, 'os_equip_outro_wrap')">
+                        <option value="">Selecione...</option>
+                        <option value="Desktop">Desktop</option>
+                        <option value="Notebook">Notebook</option>
+                        <option value="Impressora">Impressora</option>
+                        <option value="Outros">Outros (Qual?)</option>
+                    </select>
+                </div>
+                <div id="os_equip_outro_wrap" style="display:none;" class="form-group">
+                    <label>Qual Equipamento?</label>
+                    <input type="text" id="os_equip_outro" placeholder="Ex: Estabilizador, Scanner...">
+                </div>
+            </div>
+
+            <button class="btn-print" onclick="gerarImpressao()">🖨️ IMPRIMIR DOCUMENTO</button>
+        </div>
+    </main>
+
+    <div id="area-impressao">
+        <div class="print-header">
+            <img src="logo-prefeitura.png" class="print-logo">
+            <div style="font-weight: bold;">PREFEITURA MUNICIPAL DE GOIANA</div>
+            <div style="font-size: 0.8rem;">SETOR DE TECNOLOGIA DA INFORMAÇÃO</div>
+        </div>
+
+        <div id="print-dinamico"></div>
+
+    </div>
+
+    <script type="module">
+    // 1. Importações e Configuração (Mantidas)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC...", 
+        authDomain: "gerenciamento-maquinas-goiana.firebaseapp.com",
+        databaseURL: "https://gerenciamento-maquinas-goiana-default-rtdb.firebaseio.com",
+        projectId: "gerenciamento-maquinas-goiana",
+        storageBucket: "gerenciamento-maquinas-goiana.firebasestorage.app",
+        messagingSenderId: "532766971298",
+        appId: "1:532766971298:web:d04d1e40d0d349a7a48efb"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let abaAtiva = 'termo';
+    let listaEquipamentos = []; // Array para armazenar os múltiplos itens
+
+    // --- FUNÇÃO DE BUSCA E ADIÇÃO À LISTA ---
+    async function buscarPorTombamento(valor) {
+        const termoBusca = valor.trim();
+        if (termoBusca.length < 2) return;
+
+        const dbRef = ref(db, 'equipamentos');
+        
+        try {
+            const snapshot = await get(dbRef);
+            if (snapshot.exists()) {
+                const dados = snapshot.val();
+                const encontrado = Object.values(dados).find(item => 
+                    item.tombamento && item.tombamento.toString().endsWith(termoBusca)
+                );
+
+                if (encontrado) {
+                    // Verifica se já não foi adicionado
+                    if (!listaEquipamentos.some(e => e.tombamento === encontrado.tombamento)) {
+                        listaEquipamentos.push(encontrado);
+                        renderizarListaTela();
+                        
+                        // Preenche o setor automaticamente baseado no primeiro item adicionado
+                        if (listaEquipamentos.length === 1) {
+                            document.getElementById('t_setor').value = encontrado.secretaria || '';
+                        }
+                    }
+
+                    // Limpa o campo para o próximo e dá o feedback visual que você configurou
+                    document.getElementById('t_tombo').value = "";
+                    document.getElementById('t_tombo').style.border = "2px solid #27ae60";
+                    setTimeout(() => { document.getElementById('t_tombo').style.border = ""; }, 1500);
+                    
+                } else {
+                    document.getElementById('t_tombo').style.backgroundColor = "#fff5f5";
+                }
+            }
+        } catch (error) {
+            console.error("Erro na busca:", error);
+        }
+    }
+
+    // Função para mostrar a lista na tela do celular
+    function renderizarListaTela() {
+        const container = document.getElementById('lista-equipamentos-selecionados');
+        
+        // 1. Renderiza os itens na tela (sua lógica atual)
+        container.innerHTML = listaEquipamentos.map((item, index) => `
+            <div style="background: #e7f1ff; padding: 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #b3d7ff;">
+                <span style="font-size: 0.85rem;"><strong>${item.tombamento}</strong> - ${item.tipo} ${item.modelo}</span>
+                <button onclick="removerItem(${index})" style="background: #ff7675; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">X</button>
+            </div>
+        `).join('');
+
+        // 2. NOVO: Lógica para mostrar/esconder o quadro de especificações
+        // Ela verifica se na lista existe algum Notebook, Desktop ou Computador
+        const temPC = listaEquipamentos.some(item => {
+            const termo = (item.tipo + " " + item.modelo).toLowerCase();
+            return termo.includes("notebook") || 
+                termo.includes("desktop") || 
+                termo.includes("computador") || 
+                termo.includes("cpu");
+        });
+
+        // 3. Aplica a visibilidade no elemento que você colou no HTML
+        const quadroSpecs = document.getElementById('campos-especificacoes');
+        if (quadroSpecs) {
+            quadroSpecs.style.display = temPC ? 'block' : 'none';
+        }
+    }
+
+    // Torna a remoção acessível
+    window.removerItem = (index) => {
+        listaEquipamentos.splice(index, 1);
+        renderizarListaTela();
+    };
+
+    // --- EVENTOS ---
+    document.getElementById('t_tombo').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            buscarPorTombamento(e.target.value);
+        }
+    });
+
+    document.getElementById('t_tombo').addEventListener('blur', (e) => {
+        buscarPorTombamento(e.target.value);
+    });
+
+    window.toggleTab = function(aba) {
+        abaAtiva = aba;
+        document.getElementById('form-termo').style.display = aba === 'termo' ? 'block' : 'none';
+        document.getElementById('form-os').style.display = aba === 'os' ? 'block' : 'none';
+        document.getElementById('btn-termo').classList.toggle('active', aba === 'termo');
+        document.getElementById('btn-os').classList.toggle('active', aba === 'os');
+    };
+
+    // --- IMPRESSÃO ATUALIZADA COM TABELA ---
+    window.gerarImpressao = function() {
+        const printArea = document.getElementById('print-dinamico');
+        const data = new Date().toLocaleDateString('pt-BR');
+        document.querySelectorAll('.data-hoje').forEach(el => el.innerText = data);
+
+        if (abaAtiva === 'termo') {
+            const temComputador = listaEquipamentos.some(item => {
+                const termo = (item.tipo + " " + item.modelo).toLowerCase();
+                return termo.includes("notebook") || termo.includes("desktop") || termo.includes("computador") || termo.includes("cpu");
+            });
+
+            const cpu = document.getElementById('spec_cpu').value;
+            const ram = document.getElementById('spec_ram').value;
+            const disco = document.getElementById('spec_disco').value;
+
+            const blocoSoftwares = temComputador ? `
+                <div style="margin-top: 5px; border: 1px solid #000; padding: 5px 8px;">
+                    <div style="font-weight: bold; text-decoration: underline; margin-bottom: 3px; font-size: 0.75rem;">
+                        SOFTWARES PADRÃO INSTALADOS:
+                    </div>
+                    <div style="font-size: 0.7rem; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px;">
+                        <span>[x] AVG Antivírus</span> <span>[x] Anydesk</span> <span>[x] Adobe Reader</span>
+                        <span>[x] LibreOffice</span> <span>[x] Java</span> <span>[x] WinRAR</span>
+                        <span>[x] Google Chrome</span>
+                    </div>
+                </div>
+            ` : "";
+
+            const blocoEspecificacoes = (temComputador && (cpu || ram || disco)) ? `
+                <div style="border: 1px solid #000; border-top: none; padding: 5px 8px; background-color: #f9f9f9;">
+                    <div style="font-size: 0.75rem;">
+                        <strong>CONFIGURAÇÃO:</strong> CPU: ${cpu || '---'} | RAM: ${ram || '---'} | HD/SSD: ${disco || '---'}
+                    </div>
+                </div>
+            ` : "";
+
+            const linhasTabela = listaEquipamentos.map(item => `
+                <tr>
+                    <td style="border: 1px solid #000; padding: 5px; font-size: 0.8rem;">${item.tipo} ${item.marca} ${item.modelo}</td>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: center; font-size: 0.8rem;">${item.tombamento}</td>
+                </tr>
+            `).join('');
+
+            printArea.innerHTML = `
+                <div class="print-title" style="margin-bottom: 10px;">Termo de Responsabilidade e Entrega</div>
+                
+                <div class="box-dados" style="font-size: 0.85rem; line-height: 1.5;">
+                    <strong>ÓRGÃO SOLICITANTE:</strong> ${document.getElementById('t_setor').value || '__________'}<br>
+                    <strong>RESPONSÁVEL PELA SOLICITAÇÃO:</strong> ${document.getElementById('t_receptor').value || '__________'}
+                </div>
+                
+                <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
+                    <thead>
+                        <tr style="background: #eee;">
+                            <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 0.8rem;">Descrição do Equipamento</th>
+                            <th style="border: 1px solid #000; padding: 5px; width: 110px; font-size: 0.8rem;">Patrimônio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${linhasTabela || '<tr><td colspan="2" style="text-align:center; padding:10px; border:1px solid #000;">Nenhum item adicionado</td></tr>'}
+                    </tbody>
+                </table>
+
+                ${blocoSoftwares}
+                ${blocoEspecificacoes}
+
+                <div style="margin-top: 10px; border: 1px solid #000; padding: 8px;">
+                    <div style="font-weight: bold; font-size: 0.8rem; text-align: center; margin-bottom: 5px; text-decoration: underline;">DEVERES E OBRIGAÇÕES DO USUÁRIO</div>
+                    
+                    <p style="font-size: 0.72rem; text-align: justify; margin-bottom: 8px; line-height: 1.4;">
+                        Eu ____________________________________________________ CPF: _________________ e matrícula/nº portaria: ________________ 
+                        responsabilizo-me por eventuais danos causados diretamente à Administração ou a terceiros, decorrentes de minha culpa ou dolo, 
+                        durante todo o período em que o(s) bem(ns) acima especificado(s) ficarem sob a minha guarda e utilização, bem como declaro ciência das seguintes condições:
+                    </p>
+
+                    <ul style="font-size: 0.7rem; text-align: justify; padding-left: 15px; margin: 0; line-height: 1.2;">
+                        <li>O equipamento citado é cedido à título de empréstimo, sendo de propriedade do Gabinete do Prefeito da Prefeitura Municipal de Goiana-PE;</li>
+                    <li>Em situações de roubo, furto ou extravio deverei informar imediatamente ao setor chefia de Gabinete deste órgão e providenciar boletim de ocorrência policial;</li>
+                    <li>Em casos de danos no equipamento, deverei notificar o setor chefia de Gabinete deste órgão, devendo este avaliar o dano e o valor a ser ressarcido;</li>
+                    <li>Nas situações de desligamento deste órgão, o equipamento deverá ser devolvido ao setor chefia de Gabinete em perfeito estado de conservação;</li>
+                    <li style="list-style: none; font-weight: bold; margin-top: 3px; margin-left: -15px;">Para equipamentos de informática:</li>
+                    <li>Poderá ser solicitada a devolução temporária para verificações e/ou atualizações de programas pela TI;</li>
+                    <li>Poderão ser utilizados apenas sistemas e programas previamente autorizados pelo Gabinete do Prefeito;</li>
+                    <li>Nenhuma alteração no hardware poderá ser realizada sem o envolvimento da TI.</li>
+                    </ul>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; gap: 20px;">
+                    <div style="margin-top: 80px; border-top: 1px solid #000; width: 45%; text-align: center; padding-top: 5px; font-size: 0.8rem;">
+                        <strong>Chefe de Gabinete</strong><br>
+                        Goiana-PE, ${data}
+                    </div>
+                    <div style="margin-top: 80px; border-top: 1px solid #000; width: 45%; text-align: center; padding-top: 5px; font-size: 0.8rem;">
+                        <strong>Assinatura do Responsável</strong>
+                    </div>
+                </div>
+
+                <div style="page-break-before: always; margin-top: 30px;">
+                    <div class="print-header" style="text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px;">
+                        <img src="logo-prefeitura.png" class="print-logo" style="max-width: 150px; margin-bottom: 10px;">
+                        <div style="font-weight: bold;">PREFEITURA MUNICIPAL DE GOIANA</div>
+                        <div style="font-size: 0.8rem;">SETOR DE TECNOLOGIA DA INFORMAÇÃO</div>
+                    </div>
+
+                    <div class="print-title" style="background: #eee; padding: 5px; font-weight: bold; border: 1px solid #000; text-align: center; text-transform: uppercase; margin-bottom: 20px;">
+                        DEVOLUÇÃO DE EQUIPAMENTO
+                    </div>
+                    
+                    <div style="border: 1px solid #000; padding: 20px; font-size: 0.9rem; line-height: 2.2;">
+                        Atestamos que o equipamento foi devolvido em __/__/____, nas seguintes condições:<br><br>
+                        
+                        ( &nbsp; ) em perfeito estado<br>
+                        ( &nbsp; ) Apresentando defeito: ________________________________________________<br>
+                        ( &nbsp; ) Faltando peças ou acessórios: __________________________________________<br><br>
+                        
+                        Nome do responsável: _____________________________________________________<br>
+                        Matrícula do responsável: __________________________________________________<br>
+                        Assinatura do responsável pelo recebimento: __________________________________
+                    </div>
+                </div>
+
+            `;
+        } else {
+            // 1. Coleta de dados dos novos campos do formulário
+            const orgao = document.getElementById('os_orgao').value || '__________';
+            const solicitante = document.getElementById('os_solicitante').value || '__________';
+            
+            // Tratamento da data (converte de AAAA-MM-DD para DD/MM/AAAA)
+            const dataSolRaw = document.getElementById('os_data_solicitacao').value;
+            const dataSolicitacao = dataSolRaw ? dataSolRaw.split('-').reverse().join('/') : '____/____/____';
+            
+            // Lógica para capturar o valor dos Selects ou o texto digitado em "Outros"
+            const servicoSelect = document.getElementById('os_tipo_servico').value;
+            const servico = servicoSelect === 'Outros' ? document.getElementById('os_servico_outro').value : servicoSelect;
+            
+            const equipSelect = document.getElementById('os_tipo_equip').value;
+            const equipamento = equipSelect === 'Outros' ? document.getElementById('os_equip_outro').value : equipSelect;
+
+            // 2. Montagem do HTML de Impressão
+            printArea.innerHTML = `
+                <div class="print-title" style="margin-bottom: 15px;">Ordem de Serviço Técnico</div>
+                
+                <div class="box-dados" style="font-size: 0.85rem; line-height: 1.7;">
+                    <strong>ÓRGÃO SOLICITANTE:</strong> ${orgao}<br>
+                    <strong>RESPONSÁVEL PELA SOLICITAÇÃO:</strong> ${solicitante}<br>
+                    <strong>DATA DA SOLICITAÇÃO:</strong> ${dataSolicitacao}<br>
+                    <strong>TIPO DE SERVIÇO:</strong> ${servico || '____________________'}<br>
+                    <strong>TIPO DE EQUIPAMENTO:</strong> ${equipamento || '____________________'}
+                </div>
+
+                <div style="border: 1px solid #000; padding: 15px; margin-top: 10px;">
+                    <div style="font-size: 0.9rem; line-height: 2.2;">
+                        <strong>DATA DO ATENDIMENTO:</strong> ____/____/____<br>
+                        <strong>RESPONSÁVEL TÉCNICO:</strong> __________________________________________
+                    </div>
+                    
+                    <div style="margin-top: 15px;">
+                        <strong>DESCRIÇÃO DO SERVIÇO REALIZADO:</strong>
+                        <div style="border: 1px solid #000; height: 350px; margin-top: 10px; background-color: #fff;"></div>
+                        <i style="font-size: 0.65rem; color: #555;">(Relate detalhadamente os procedimentos realizados, peças trocadas ou softwares instalados)</i>
+                    </div>
+                </div>
+
+                <div style="margin-top: 50px;">
+                    <div style="text-align: right; font-size: 0.9rem; margin-bottom: 50px;">
+                        Goiana-PE, ____/____/____
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="border-top: 1px solid #000; width: 300px; margin: 0 auto; padding-top: 5px;">
+                            <strong>Solicitante</strong>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        window.print();
+    };
+    // Função para adicionar itens que não estão no banco de dados
+    function adicionarManual() {
+        const nomeItem = document.getElementById('t_manual').value.trim();
+        
+        if (nomeItem === "") return;
+
+        // Criamos um objeto com o mesmo formato do Firebase para não quebrar a lista
+        const itemManual = {
+            tipo: nomeItem,
+            marca: "",
+            modelo: "",
+            tombamento: "S/T" // "S/T" para Sem Tombamento
+        };
+
+        listaEquipamentos.push(itemManual);
+        renderizarListaTela();
+        
+        // Limpa o campo manual e foca nele para o próximo item
+        document.getElementById('t_manual').value = "";
+        document.getElementById('t_manual').focus();
+    }
+
+    // Torna a função acessível ao botão do HTML
+    window.adicionarManual = adicionarManual;
+    
+    //controlar a função "outros" na tela de ordem de serviço
+    window.checkOutros = function(select, targetId) {
+        const wrap = document.getElementById(targetId);
+        wrap.style.display = select.value === 'Outros' ? 'block' : 'none';
+    };      
+
+    // Opcional: Permitir dar Enter também no campo manual
+    document.getElementById('t_manual').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            adicionarManual();
+        }
+    });
+
+
+</script>
+</body>
+</html>
