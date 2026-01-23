@@ -404,6 +404,44 @@
 
 
 
+    /* Estilo do Botão de Documentos (Desktop) */
+    .btn-documentos {
+        display: block;
+        width: 100%;
+        background-color: var(--primary-blue);
+        color: white;
+        text-align: center;
+        padding: 14px; /* Mesma altura do .btn-save */
+        margin-top: 10px;
+        margin-bottom: 5px;
+        text-decoration: none;
+        border-radius: 6px; /* Mantendo o padrão das suas inputs */
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: 0.3s;
+        box-sizing: border-box;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-documentos:hover {
+        background-color: var(--secondary-blue);
+        filter: brightness(1.1);
+    }
+
+    /* Ajuste para Mobile (Dentro do seu @media max-width: 768px) */
+    @media (max-width: 768px) {
+        .btn-documentos {
+            height: 48px; /* Padronizado com seus outros inputs mobile */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+    }
+
+
+
     </style>
 </head>
 <body>
@@ -519,6 +557,7 @@
 
             <button type="submit" id="btnSubmit" class="btn-save">CADASTRAR EQUIPAMENTO</button>
             <button type="button" id="btnCancel" class="btn-cancel" onclick="resetForm()">CANCELAR EDIÇÃO</button>
+            <a href="documentos.html" class="btn-documentos">GERAR TERMOS / O.S.</a>
         </form>
     </aside>
 
