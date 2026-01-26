@@ -99,7 +99,7 @@
 
         /* Layout */
         .container { 
-            max-width: 1350px; 
+            max-width: 1200px; 
             margin: 30px auto; 
             display: grid; 
             grid-template-columns: 380px 1fr; 
@@ -215,7 +215,9 @@
         .table-wrapper { 
             border-radius: 8px; 
             overflow-x: auto; 
-            border: 1px solid var(--border-color); 
+            border: 1px solid var(--border-color);
+            max-width: 100%; 
+            overflow: hidden;  
         }
         table { 
             width: 100%; 
@@ -350,19 +352,24 @@
         /* O CARD (BALÃO ÚNICO) */
         tr {
             background: #ffffff;
-            margin-bottom: 20px;
+            margin: 0 0 20px 0;
+            width: 100% !important;
             border-radius: 15px; /* Cantos arredondados */
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.06); /* Sombra suave */
             border: 1px solid #eee;
-            text-align: center; /* Centraliza o texto no card */
+            text-align: left; /* Centraliza o texto no card */
+            box-sizing: border-box;
         }
 
         /* Células de texto - SEM LINHAS DIVISÓRIAS */
         td {
             border: none !important; /* Remove qualquer linha entre os textos */
             padding: 8px 0;
-            display: block;
+            display: flex;
+            flex-direction: column; /* Label em cima, Valor embaixo */
+            align-items: left !important; /* Centraliza o conteúdo dentro do flex */
+            width: 100%;
         }
 
         /* Rótulos (Labels) que aparecem acima do texto */
@@ -568,7 +575,7 @@
             <div class="search-container" style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <input type="text" placeholder="Filtrar por tombamento ou modelo..." id="filtroBusca" onkeyup="window.filtrarTabela()" class="search-box" style="flex: 2; min-width: 200px;">
 
-                <select id="filtroSecretaria" onchange="window.filtrarTabela()" class="search-box" style="flex: 1; min-width: 150px;">
+                <select id="filtroSecretaria" onchange="window.filtrarTabela(true)" class="search-box" style="flex: 1; min-width: 150px;">
                     <option value="">Todas as Secretarias</option>
                     <option value="GABINETE">Gabinete</option> 
                     <option value="PLANEJAMENTO">Planejamento</option>
@@ -610,7 +617,6 @@
                         <th>Tipo</th>
                         <th>Equipamento</th>
                         <th>Secretaria / Local</th>
-                        <th class="acoes-col">Ações</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -669,11 +675,16 @@
                 <td data-label="Tipo"><span class="badge-tipo">${item.tipo}</span></td>
                 <td data-label="Equipamento">${item.marca} ${item.modelo}</td>
                 <td data-label="Localização">${item.secretaria}<br><small>${item.localizacao}</small></td>
-                <td class="acoes-col">
-                    <button class="btn-action edit-btn" onclick="editarItem('${id}')">Editar</button>
-                    <button class="btn-action delete-btn" onclick="removerItem('${id}')">Excluir</button>
-                </td>
+                
             `;
+
+            // 2. Torna a linha toda clicável (O "botão invisível")
+            row.style.cursor = "pointer";
+            row.title = "Clique para ver detalhes"; // Dica que aparece ao passar o mouse no PC
+            row.onclick = () => {
+                window.location.href = `detalhes.html?id=${id}`;
+            };
+
         });
 
         // --- LINHA ADICIONADA: Atualiza o contador e aplica filtros ativos ---
@@ -684,6 +695,8 @@
         const contador = document.getElementById('contadorItens');
         if (contador) contador.innerText = "Nenhum equipamento cadastrado.";
     }
+
+    
 });
 
     // --- FUNÇÃO: SALVAR / ATUALIZAR ---
@@ -806,18 +819,33 @@
         document.getElementById('outraSecretaria').classList.add('hidden');
     };
 
-    window.filtrarTabela = () => {
-    const buscaGeral = document.getElementById('filtroBusca').value.toUpperCase();
-    const buscaSec = document.getElementById('filtroSecretaria').value.toUpperCase();
-    const contadorTexto = document.getElementById('contadorItens'); // Pega o elemento do contador
-    
-    // Pega as linhas da tabela
+    // 1. Criamos essa variável FORA da função para ela "lembrar" que o usuário já interagiu
+let buscaIniciada = false;
+
+window.filtrarTabela = (forçarExibicao = false) => {
+    const buscaGeral = document.getElementById('filtroBusca').value.toUpperCase().trim();
+    const filtroSecElement = document.getElementById('filtroSecretaria');
+    const buscaSec = filtroSecElement.value.toUpperCase();
+    const contadorTexto = document.getElementById('contadorItens'); 
     const linhas = tabela.getElementsByTagName('tr');
+
+    // 2. Lógica de Ativação: Se ele digitou algo, mudou a secretaria ou forçou, 
+    // a "buscaIniciada" vira true e não volta mais para false.
+    if (buscaGeral !== "" || filtroSecElement.selectedIndex > 0 || forçarExibicao) {
+        buscaIniciada = true;
+    }
 
     let itensVisiveis = 0;
     let totalItens = linhas.length;
 
     for (let row of linhas) {
+        // Se a busca ainda não foi iniciada, mantém a tela limpa
+        if (!buscaIniciada) {
+            row.style.display = "none";
+            continue;
+        }
+
+        // Se a busca já foi iniciada, aplicamos o filtro original
         const colSecretaria = row.cells[3] ? row.cells[3].innerText.toUpperCase().trim() : "";
         const textoCompleto = row.innerText.toUpperCase();
 
@@ -826,23 +854,20 @@
 
         if (bateGeral && bateSecretaria) {
             row.style.display = "";
-            itensVisiveis++; // Soma se estiver visível
+            itensVisiveis++;
         } else {
             row.style.display = "none";
         }
     }
 
-    // --- LOGICA QUE ATUALIZA O TEXTO NA TELA ---
+    // --- ATUALIZAÇÃO DO CONTADOR ---
     if (contadorTexto) {
-        if (totalItens === 0) {
-            contadorTexto.innerText = "Nenhum item registrado";
-            contadorTexto.style.background = "#fab1a0"; // Cor rosada para vazio
-        } else if (buscaGeral === "" && buscaSec === "") {
-            contadorTexto.innerText = `Total: ${totalItens} equipamentos registrados`;
-            contadorTexto.style.background = "#e7f1ff"; // Azul claro padrão
+        if (!buscaIniciada) {
+            contadorTexto.innerText = "Pesquise ou selecione uma secretaria para listar.";
+            contadorTexto.style.background = "#e7f1ff";
         } else {
-            contadorTexto.innerText = `Filtrado: ${itensVisiveis} de ${totalItens} itens encontrados`;
-            contadorTexto.style.background = "#fff3cd"; // Amarelo para filtro ativo
+            contadorTexto.innerText = `Mostrando ${itensVisiveis} de ${totalItens} equipamentos`;
+            contadorTexto.style.background = (itensVisiveis > 0) ? "#fff3cd" : "#fab1a0";
         }
     }
 };
