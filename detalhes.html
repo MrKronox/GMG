@@ -82,6 +82,40 @@
             color: var(--primary-blue);
         }
 
+        /* --- ESTILO DOS NOVOS BALÕES DE EDIÇÃO --- */
+        .input-editavel {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px; /* Igual ao arredondamento dos cards */
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: #fcfcfc;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Sombra interna suave */
+        }
+
+        .input-editavel:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); /* Brilho azul igual ao index */
+        }
+
+        /* Ajuste para quando o campo for o de observações */
+        textarea.input-editavel {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Impede que a borda de baixo da info-box suma na edição */
+        .info-box:focus-within {
+            border-bottom: 1px solid var(--primary-blue);
+        }
+
         @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
         @media print { .btn { display: none; } body { padding: 0; } .container-detalhes { box-shadow: none; border: 1px solid #000; } }
     </style>
@@ -95,58 +129,62 @@
         </div>
 
         <div class="content">
-            <div class="info-grid">
-                <div class="info-box">
-                    <label>Tipo de Equipamento</label>
-                    <span id="det-tipo">-</span>
-                </div>
-                <div class="info-box">
-                    <label>Marca / Fabricante</label>
-                    <span id="det-marca">-</span>
-                </div>
-                <div class="info-box">
-                    <label>Modelo</label>
-                    <span id="det-modelo">-</span>
-                </div>
-                <div class="info-box">
-                    <label>Secretaria / Departamento</label>
-                    <span id="det-secretaria">-</span>
-                </div>
-                <div class="info-box full-width">
-                    <label>Localização Específica</label>
-                    <span id="det-localizacao">-</span>
-                </div>
-                <div class="info-box full-width">
-                    <label>Observações e Histórico</label>
-                    <div class="obs-box" id="det-obs">Nenhuma observação registrada.</div>
-                </div>
-            </div>
-
-            <div class="info-box full-width" style="margin-top: 25px;">
-                <label>Histórico de Movimentações (Rastreabilidade)</label>
-                <div id="lista-movimentacao" class="timeline">
-                    <p style="color: #888; font-size: 0.9rem;">Nenhuma movimentação registada ainda.</p>
-                </div>
-            </div>
-
-            <div style="margin-top: 20px;">
-                <button onclick="gerarTermo()" class="btn-report" style="background-color: #27ae60; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
-                    📄 Gerar Termo de Entrega
-                </button>
-            </div>
-
-            <div class="footer-btns">
-                <a href="index.html" class="btn btn-voltar">Voltar à Lista</a>
-                <button onclick="window.print()" class="btn btn-print">Imprimir Ficha</button>
-            </div>
+    <div class="info-grid" id="container-campos">
+        <div class="info-box">
+            <label>Tipo de Equipamento</label>
+            <span id="det-tipo">-</span>
         </div>
+        <div class="info-box">
+            <label>Marca / Fabricante</label>
+            <span id="det-marca">-</span>
+        </div>
+        <div class="info-box">
+            <label>Modelo</label>
+            <span id="det-modelo">-</span>
+        </div>
+        <div class="info-box">
+            <label>Secretaria / Departamento</label>
+            <span id="det-secretaria">-</span>
+        </div>
+        <div class="info-box full-width">
+            <label>Localização Específica</label>
+            <span id="det-localizacao">-</span>
+        </div>
+        <div class="info-box full-width">
+            <label>Observações e Histórico</label>
+            <div class="obs-box"><span id="det-obs">Nenhuma observação registrada.</span></div>
+        </div>
+    </div>
+
+    <div class="info-box full-width" style="margin-top: 25px;">
+        <label>Histórico de Movimentações (Rastreabilidade)</label>
+        <div id="lista-movimentacao" class="timeline">
+            <p style="color: #888; font-size: 0.9rem;">Nenhuma movimentação registrada ainda.</p>
+        </div>
+    </div>
+
+
+    <div class="footer-btns" id="botoes-visualizacao" style="display: flex; gap: 10px; margin-top: 20px;">
+        <button onclick="habilitarEdicao()" class="btn" style="background: #f39c12; color: white; flex: 1;">✏️ Editar</button>
+        <button onclick="deletarEquipamento()" class="btn" style="background: #e74c3c; color: white; flex: 1;">🗑️ Excluir</button>
+    </div>
+
+    <div class="footer-btns" id="botoes-edicao" style="display: none; gap: 10px; margin-top: 20px;">
+        <button onclick="salvarAlteracoes()" class="btn" style="background: #27ae60; color: white; flex: 1;">✅ Salvar</button>
+        <button onclick="cancelarEdicao()" class="btn" style="background: #95a5a6; color: white; flex: 1;">Cancelar</button>
+    </div>
+
+    <div class="footer-btns" style="margin-top: 15px;">
+        <a href="index.html" class="btn btn-voltar" style="width: 100%; display: block; box-sizing: border-box;">Voltar à Lista</a>
+    </div>
+</div>
     </div>
 
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    // Adicionado update e remove nos imports
+    import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // Suas credenciais
     const firebaseConfig = {
         apiKey: "AIzaSyB7kGKWnj0EeQyPLhFmYE0Otju-AVgOs7U",
         authDomain: "gerenciamento-maquinas-goiana.firebaseapp.com",
@@ -160,65 +198,109 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // 1. Pegamos o ID da URL
     const urlParams = new URLSearchParams(window.location.search);
     const idEquipamento = urlParams.get('id');
 
     if (idEquipamento) {
-        // 2. Referência para o item específico no Firebase
         const itemRef = ref(db, `equipamentos/${idEquipamento}`);
 
+        // CARREGAR DADOS
         onValue(itemRef, (snapshot) => {
             const item = snapshot.val();
-
             if (item) {
-                // 3. Preenchemos as informações básicas (usando seus IDs atuais)
                 document.getElementById('det-tombamento').innerText = "Tombamento: " + (item.tombamento || 'N/A');
-                document.getElementById('det-tipo').innerText = item.tipo;
-                document.getElementById('det-marca').innerText = item.marca;
-                document.getElementById('det-modelo').innerText = item.modelo;
-                document.getElementById('det-secretaria').innerText = item.secretaria;
+                document.getElementById('det-tipo').innerText = item.tipo || "-";
+                document.getElementById('det-marca').innerText = item.marca || "-";
+                document.getElementById('det-modelo').innerText = item.modelo || "-";
+                document.getElementById('det-secretaria').innerText = item.secretaria || "-";
                 document.getElementById('det-localizacao').innerText = item.localizacao || "Não informada";
                 document.getElementById('det-obs').innerText = item.obs || "Sem observações adicionais.";
 
-                // 4. Lógica da Linha do Tempo (Movimentação)
+                // Histórico de Movimentação
                 const containerMov = document.getElementById('lista-movimentacao');
-                
                 if (item.historicoMovimentacao && item.historicoMovimentacao.length > 0) {
-                    containerMov.innerHTML = ""; // Limpa o "Nenhuma movimentação"
-
-                    // Inverte a ordem para mostrar o mais recente no topo
+                    containerMov.innerHTML = "";
                     [...item.historicoMovimentacao].reverse().forEach(mov => {
                         const divItem = document.createElement('div');
                         divItem.className = 'timeline-item';
-                        
                         divItem.innerHTML = `
                             <span class="timeline-date">${mov.data}</span>
                             <div class="timeline-content">
                                 <div><span class="mov-label">Origem:</span> ${mov.origem}</div>
                                 <div><span class="mov-label">Destino:</span> ${mov.destino}</div>
-                            </div>
-                        `;
+                            </div>`;
                         containerMov.appendChild(divItem);
                     });
                 }
             } else {
-                alert("Equipamento não encontrado no banco de dados!");
+                alert("Equipamento não encontrado!");
                 window.location.href = 'index.html';
             }
         });
+
+        // --- FUNÇÕES DE AÇÃO ---
+
+        // 1. HABILITAR EDIÇÃO (Transforma spans em inputs com estilo moderno)
+window.habilitarEdicao = function() {
+    document.getElementById('botoes-visualizacao').style.display = 'none';
+    document.getElementById('botoes-edicao').style.display = 'flex';
+
+    const campos = ['det-tipo', 'det-marca', 'det-modelo', 'det-secretaria', 'det-localizacao', 'det-obs'];
+    
+    campos.forEach(id => {
+        const el = document.getElementById(id);
+        // Limpa os textos padrão para não aparecerem dentro da caixa de edição
+        const valorAtual = (el.innerText === "-" || el.innerText === "Não informada" || el.innerText === "Sem observações adicionais.") ? "" : el.innerText;
+        
+        if (id === 'det-obs') {
+            // Aplicando a classe CSS para o balão de observações
+            el.innerHTML = `<textarea id="input-${id}" class="input-editavel">${valorAtual}</textarea>`;
+        } else {
+            // Aplicando a classe CSS para os balões de texto
+            el.innerHTML = `<input type="text" id="input-${id}" value="${valorAtual}" class="input-editavel">`;
+        }
+    });
+};
+
+        // 2. SALVAR ALTERAÇÕES
+        window.salvarAlteracoes = function() {
+            const novosDados = {
+                tipo: document.getElementById('input-det-tipo').value,
+                marca: document.getElementById('input-det-marca').value,
+                modelo: document.getElementById('input-det-modelo').value,
+                secretaria: document.getElementById('input-det-secretaria').value,
+                localizacao: document.getElementById('input-det-localizacao').value,
+                obs: document.getElementById('input-det-obs').value
+            };
+
+            update(itemRef, novosDados)
+                .then(() => {
+                    alert("Dados atualizados com sucesso!");
+                    location.reload(); // Volta para o modo visualização
+                })
+                .catch(error => alert("Erro ao atualizar: " + error.message));
+        };
+
+        // 3. CANCELAR EDIÇÃO
+        window.cancelarEdicao = function() {
+            location.reload();
+        };
+
+        // 4. EXCLUIR EQUIPAMENTO
+        window.deletarEquipamento = function() {
+            if (confirm("⚠️ TEM CERTEZA? Esta máquina será removida permanentemente do sistema.")) {
+                remove(itemRef)
+                    .then(() => {
+                        alert("Equipamento removido!");
+                        window.location.href = 'index.html';
+                    })
+                    .catch(error => alert("Erro ao excluir: " + error.message));
+            }
+        };
+
     } else {
         window.location.href = 'index.html';
     }
-
-    // 5. Função Gerar Termo (Exposta para o botão onclick)
-    window.gerarTermo = function() {
-        if (idEquipamento) {
-            window.open(`termo.html?id=${idEquipamento}`, '_blank');
-        } else {
-            alert("Erro ao identificar o equipamento.");
-        }
-    };
 </script>
 </body>
 </html>
