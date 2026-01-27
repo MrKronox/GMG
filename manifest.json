@@ -1,0 +1,16 @@
+{
+  "short_name": "GMG",
+  "name": "Gerenciamento de Máquinas Goiana",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "index.html",
+  "display": "standalone",
+  "theme_color": "#007bff",
+  "background_color": "#f4f7f9"
+}
