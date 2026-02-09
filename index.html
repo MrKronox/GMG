@@ -454,7 +454,15 @@
             font-size: 1rem;
         }
     }
+        /*parte do popup de alerta */
+        .item-pendente {
+            border-left: 5px solid #e74c3c !important; /* Borda vermelha grossa na lateral */
+            background-color: #fff5f5 !important; /* Fundo levemente avermelhado */
+        }
 
+        .item-pendente:hover {
+            background-color: #ffebeb !important;
+        }
 
 
     </style>
@@ -610,6 +618,10 @@
                 </div>
             </div>
 
+            <div id="alerta-pendencias" style="display:none; background: #ff7675; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600;">
+                ⚠️ Existem equipamentos que precisam de verificação de 90 dias!
+            </div>
+
             <div style="text-align: left; margin-top: 5px;">
                 <p id="contadorItens" style="font-size: 0.85rem; color: #007bff; margin-bottom: 0; font-weight: 700; background: #e7f1ff; display: inline-block; padding: 5px 15px; border-radius: 20px; border: 1px solid #b3d7ff;">
                     Carregando itens...
@@ -666,46 +678,73 @@
 
     // --- FUNÇÃO: CARREGAR DADOS (Sincronização Automática) ---
     onValue(dbRef, (snapshot) => {
-    tabela.innerHTML = "";
-    const data = snapshot.val();
-    if (data) {
-        Object.keys(data).forEach(id => {
-            const item = data[id];
-            const row = tabela.insertRow();
-            row.style.cursor = "pointer";
-            row.onclick = (e) => {
-                if (e.target.tagName === 'BUTTON') return;
-                window.location.href = `detalhes.html?id=${id}`;
-            };
-
-            row.innerHTML = `
-                <td data-label="Tombamento"><strong>${item.tombamento}</strong></td>
-                <td data-label="Tipo"><span class="badge-tipo">${item.tipo}</span></td>
-                <td data-label="Equipamento">${item.marca} ${item.modelo}</td>
-                <td data-label="Localização">${item.secretaria}<br><small>${item.localizacao}</small></td>
-                
-            `;
-
-            // 2. Torna a linha toda clicável (O "botão invisível")
-            row.style.cursor = "pointer";
-            row.title = "Clique para ver detalhes"; // Dica que aparece ao passar o mouse no PC
-            row.onclick = () => {
-                window.location.href = `detalhes.html?id=${id}`;
-            };
-
-        });
-
-        // --- LINHA ADICIONADA: Atualiza o contador e aplica filtros ativos ---
-        if (window.filtrarTabela) window.filtrarTabela(); 
+        tabela.innerHTML = "";
+        const data = snapshot.val();
         
-    } else {
-        // Caso o banco esteja vazio
-        const contador = document.getElementById('contadorItens');
-        if (contador) contador.innerText = "Nenhum equipamento cadastrado.";
-    }
+        let listaTombamentosPendentes = []; // Lista para guardar os números encontrados
+        const hoje = new Date();
 
-    
-});
+        if (data) {
+            Object.keys(data).forEach(id => {
+                const item = data[id];
+
+                // --- LÓGICA DE VERIFICAÇÃO DE 90 DIAS ---
+                let classePendencia = "";
+                if (item.status === "emprestado" && item.proxima_verificacao) {
+                    const dataVerificacao = new Date(item.proxima_verificacao);
+                    if (hoje > dataVerificacao) {
+                        classePendencia = "item-pendente"; // Classe para destacar a linha
+                        // Adicionamos o número do tombamento à nossa lista de pendências
+                        listaTombamentosPendentes.push(item.tombamento || "S/T");
+                    }
+                }
+
+                const row = tabela.insertRow();
+                if(classePendencia) row.classList.add(classePendencia); 
+                
+                row.style.cursor = "pointer";
+                row.title = "Clique para ver detalhes";
+                row.onclick = () => {
+                    window.location.href = `detalhes.html?id=${id}`;
+                };
+
+                const alertaVisual = classePendencia ? '<span style="color: #e74c3c;"> ⚠️</span>' : '';
+
+                row.innerHTML = `
+                    <td data-label="Tombamento"><strong>${item.tombamento}</strong>${alertaVisual}</td>
+                    <td data-label="Tipo"><span class="badge-tipo">${item.tipo}</span></td>
+                    <td data-label="Equipamento">${item.marca} ${item.modelo}</td>
+                    <td data-label="Localização">${item.secretaria}<br><small>${item.localizacao}</small></td>
+                `;
+            });
+
+            // --- ATUALIZAÇÃO DO BANNER DE ALERTA ---
+            const bannerAlerta = document.getElementById('alerta-pendencias');
+            if (bannerAlerta) {
+                if (listaTombamentosPendentes.length > 0) {
+                    bannerAlerta.style.display = "block";
+                    // Criamos o texto com os tombamentos separados por vírgula
+                    bannerAlerta.innerHTML = `
+                        <div style="padding: 10px;">
+                            ⚠️ <strong>Revisão de 90 dias pendente:</strong><br>
+                            <span style="font-size: 0.95rem; opacity: 0.9;">Equipamento(s): </span>
+                            <strong style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">
+                                ${listaTombamentosPendentes.join(", ")}
+                            </strong>
+                        </div>
+                    `;
+                } else {
+                    bannerAlerta.style.display = "none";
+                }
+            }
+
+            if (window.filtrarTabela) window.filtrarTabela(); 
+            
+        } else {
+            const contador = document.getElementById('contadorItens');
+            if (contador) contador.innerText = "Nenhum equipamento cadastrado.";
+        }
+    });
 
     // --- FUNÇÃO: SALVAR / ATUALIZAR ---
     form.addEventListener('submit', async (e) => {
