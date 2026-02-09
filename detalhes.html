@@ -39,7 +39,7 @@
         .obs-box { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid var(--primary-blue); margin-top: 20px; }
         
         .footer-btns { display: flex; gap: 10px; margin-top: 30px; }
-        .btn { flex: 1; padding: 15px; border-radius: 8px; text-align: center; text-decoration: none; font-weight: 600; cursor: pointer; border: none; }
+        .btn { flex: 1; padding: 15px; border-radius: 8px; text-align: center; text-decoration: none; font-weight: 600; cursor: pointer; border: none; color: white }
         .btn-voltar { background: #eee; color: #555; }
         .btn-print { background: var(--primary-blue); color: white; }
 
@@ -124,6 +124,38 @@
             border-bottom: 1px solid var(--primary-blue);
         }
 
+        /* Estilos para o Status de Empréstimo */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        .status-disponivel { background: #d4edda; color: #155724; }
+        .status-emprestado { background: #fff3cd; color: #856404; }
+        
+        /*está em desuso [pois está dentro do .btn] */
+        .btn-emprestar { background: #6c5ce7; color: white; }
+        .btn-devolver { background: #00b894; color: white; }
+
+        /* Modal simples para empréstimo */
+        #modal-emprestimo {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.3);
+            z-index: 1000;
+            width: 90%;
+            max-width: 400px;
+        }
+
         @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
         @media print { .btn { display: none; } body { padding: 0; } .container-detalhes { box-shadow: none; border: 1px solid #000; } }
     </style>
@@ -164,6 +196,29 @@
         </div>
     </div>
 
+    <div class="info-box full-width" style="border-bottom: 2px solid #f0f0f0; margin-bottom: 10px;">
+        <label>Status de Custódia</label>
+            <div id="status-container">
+                <span id="det-status" class="status-badge status-disponivel">Disponível</span>
+                <span id="det-responsavel" style="display:block; font-size: 0.9rem; margin-top:5px; color:#636e72;"></span>
+            </div>
+        </div>
+        
+
+    <div class="footer-btns" id="botoes-emprestimo" style="margin-top: 20px;">
+        <button id="btn-acao-emprestimo" class="btn" onclick="abrirModalEmprestimo()">🤝 Emprestar / Saída</button>
+    </div>
+
+    <div id="modal-emprestimo">
+        <h3>Registrar Saída</h3>
+        <label>Nome do Responsável</label>
+        <input type="text" id="nome-responsavel" class="input-editavel" placeholder="Quem está levando?">
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button onclick="confirmarEmprestimo()" class="btn" style="background:#27ae60; color:white;">Confirmar</button>
+            <button onclick="fecharModal()" class="btn" style="background:#eee; color:#333;">Sair</button>
+        </div>
+    </div>
+
     <div class="info-box full-width" style="margin-top: 25px;">
         <label>Histórico de Movimentações (Rastreabilidade)</label>
         <div id="lista-movimentacao" class="timeline">
@@ -181,16 +236,22 @@
         <button onclick="salvarAlteracoes()" class="btn" style="background: #27ae60; color: white; flex: 1;">✅ Salvar</button>
         <button onclick="cancelarEdicao()" class="btn" style="background: #95a5a6; color: white; flex: 1;">Cancelar</button>
     </div>
-
+    
+    <div id="aviso-revisao" style="display:none; background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align:center;">
+        <p style="margin:0; color: #856404; font-weight:600;">
+            ⚠️ Este equipamento precisa de revisão de 90 dias.
+        </p>
+        <button onclick="confirmarTudoCerto()" class="btn" style="background: #27ae60; color:white; padding: 8px 15px; margin-top: 10px; font-size: 0.85rem; width:auto;">
+            Confirmar que está com o responsável
+        </button>
+    </div>
     <div class="footer-btns" style="margin-top: 15px;">
         <a href="index.html" class="btn btn-voltar" style="width: 100%; display: block; box-sizing: border-box;">Voltar à Lista</a>
     </div>
-</div>
-    </div>
+
 
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    // Adicionado update e remove nos imports
     import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
@@ -212,65 +273,92 @@
     if (idEquipamento) {
         const itemRef = ref(db, `equipamentos/${idEquipamento}`);
 
-        // CARREGAR DADOS
+        // --- CARREGAR DADOS (Sincronização em tempo real) ---
         onValue(itemRef, (snapshot) => {
             const item = snapshot.val();
-            if (item) {
-                document.getElementById('det-tombamento').innerText = "Tombamento: " + (item.tombamento || 'N/A');
-                document.getElementById('det-tipo').innerText = item.tipo || "-";
-                document.getElementById('det-marca').innerText = item.marca || "-";
-                document.getElementById('det-modelo').innerText = item.modelo || "-";
-                document.getElementById('det-secretaria').innerText = item.secretaria || "-";
-                document.getElementById('det-localizacao').innerText = item.localizacao || "Não informada";
-                document.getElementById('det-obs').innerText = item.obs || "Sem observações adicionais.";
-
-                // Histórico de Movimentação
-                const containerMov = document.getElementById('lista-movimentacao');
-                if (item.historicoMovimentacao && item.historicoMovimentacao.length > 0) {
-                    containerMov.innerHTML = "";
-                    [...item.historicoMovimentacao].reverse().forEach(mov => {
-                        const divItem = document.createElement('div');
-                        divItem.className = 'timeline-item';
-                        divItem.innerHTML = `
-                            <span class="timeline-date">${mov.data}</span>
-                            <div class="timeline-content">
-                                <div><span class="mov-label">Origem:</span> ${mov.origem}</div>
-                                <div><span class="mov-label">Destino:</span> ${mov.destino}</div>
-                            </div>`;
-                        containerMov.appendChild(divItem);
-                    });
-                }
-            } else {
+            if (!item) {
                 alert("Equipamento não encontrado!");
                 window.location.href = 'index.html';
+                return;
+            }
+
+            // Preenchimento de texto
+            document.getElementById('det-tombamento').innerText = "Tombamento: " + (item.tombamento || 'N/A');
+            document.getElementById('det-tipo').innerText = item.tipo || "-";
+            document.getElementById('det-marca').innerText = item.marca || "-";
+            document.getElementById('det-modelo').innerText = item.modelo || "-";
+            document.getElementById('det-secretaria').innerText = item.secretaria || "-";
+            document.getElementById('det-localizacao').innerText = item.localizacao || "Não informada";
+            document.getElementById('det-obs').innerText = item.obs || "Sem observações adicionais.";
+
+            // Lógica de Status e Aviso de 90 dias
+            const elStatus = document.getElementById('det-status');
+            const elResp = document.getElementById('det-responsavel');
+            const btnEmprestar = document.getElementById('btn-acao-emprestimo');
+            const avisoRevisao = document.getElementById('aviso-revisao');
+
+            if (item.status === "emprestado") {
+                elStatus.innerText = "EMPRESTADO";
+                elStatus.className = "status-badge status-emprestado";
+                elResp.innerText = `👤 Atualmente com: ${item.responsavel_atual}`;
+                btnEmprestar.innerText = "↩️ Registrar Devolução";
+                btnEmprestar.style.background = "#00b894";
+
+                // VERIFICAÇÃO DE DATA (90 DIAS)
+                if (item.proxima_verificacao) {
+                    const hoje = new Date();
+                    const dataLimite = new Date(item.proxima_verificacao);
+                    
+                    if (hoje > dataLimite) {
+                        avisoRevisao.style.display = "block";
+                    } else {
+                        avisoRevisao.style.display = "none";
+                    }
+                }
+            } else {
+                elStatus.innerText = "DISPONÍVEL";
+                elStatus.className = "status-badge status-disponivel";
+                elResp.innerText = "✅ Disponível no setor";
+                btnEmprestar.innerText = "🤝 Emprestar / Saída";
+                btnEmprestar.style.background = "#6c5ce7";
+                avisoRevisao.style.display = "none"; // Esconde se estiver disponível
+            }
+
+            // Histórico
+            const containerMov = document.getElementById('lista-movimentacao');
+            if (item.historicoMovimentacao && item.historicoMovimentacao.length > 0) {
+                containerMov.innerHTML = "";
+                [...item.historicoMovimentacao].reverse().forEach(mov => {
+                    const divItem = document.createElement('div');
+                    divItem.className = 'timeline-item';
+                    divItem.innerHTML = `
+                        <span class="timeline-date">${mov.data}</span>
+                        <div class="timeline-content">
+                            <div><span class="mov-label">Origem:</span> ${mov.origem}</div>
+                            <div><span class="mov-label">Destino:</span> ${mov.destino}</div>
+                        </div>`;
+                    containerMov.appendChild(divItem);
+                });
             }
         });
 
-        // --- FUNÇÕES DE AÇÃO ---
+        // --- FUNÇÕES GLOBAIS (Ações) ---
 
-        // 1. HABILITAR EDIÇÃO (Transforma spans em inputs com estilo moderno)
-window.habilitarEdicao = function() {
-    document.getElementById('botoes-visualizacao').style.display = 'none';
-    document.getElementById('botoes-edicao').style.display = 'flex';
+        window.habilitarEdicao = function() {
+            document.getElementById('botoes-visualizacao').style.display = 'none';
+            document.getElementById('botoes-edicao').style.display = 'flex';
+            const campos = ['det-tipo', 'det-marca', 'det-modelo', 'det-secretaria', 'det-localizacao', 'det-obs'];
+            campos.forEach(id => {
+                const el = document.getElementById(id);
+                const valorAtual = (el.innerText === "-" || el.innerText === "Não informada" || el.innerText === "Sem observações adicionais.") ? "" : el.innerText;
+                if (id === 'det-obs') {
+                    el.innerHTML = `<textarea id="input-${id}" class="input-editavel">${valorAtual}</textarea>`;
+                } else {
+                    el.innerHTML = `<input type="text" id="input-${id}" value="${valorAtual}" class="input-editavel">`;
+                }
+            });
+        };
 
-    const campos = ['det-tipo', 'det-marca', 'det-modelo', 'det-secretaria', 'det-localizacao', 'det-obs'];
-    
-    campos.forEach(id => {
-        const el = document.getElementById(id);
-        // Limpa os textos padrão para não aparecerem dentro da caixa de edição
-        const valorAtual = (el.innerText === "-" || el.innerText === "Não informada" || el.innerText === "Sem observações adicionais.") ? "" : el.innerText;
-        
-        if (id === 'det-obs') {
-            // Aplicando a classe CSS para o balão de observações
-            el.innerHTML = `<textarea id="input-${id}" class="input-editavel">${valorAtual}</textarea>`;
-        } else {
-            // Aplicando a classe CSS para os balões de texto
-            el.innerHTML = `<input type="text" id="input-${id}" value="${valorAtual}" class="input-editavel">`;
-        }
-    });
-};
-
-        // 2. SALVAR ALTERAÇÕES
         window.salvarAlteracoes = function() {
             const novosDados = {
                 tipo: document.getElementById('input-det-tipo').value,
@@ -280,35 +368,77 @@ window.habilitarEdicao = function() {
                 localizacao: document.getElementById('input-det-localizacao').value,
                 obs: document.getElementById('input-det-obs').value
             };
-
-            update(itemRef, novosDados)
-                .then(() => {
-                    alert("Dados atualizados com sucesso!");
-                    location.reload(); // Volta para o modo visualização
-                })
-                .catch(error => alert("Erro ao atualizar: " + error.message));
+            update(itemRef, novosDados).then(() => {
+                alert("Dados atualizados!");
+                location.reload();
+            });
         };
 
-        // 3. CANCELAR EDIÇÃO
-        window.cancelarEdicao = function() {
-            location.reload();
+        window.confirmarEmprestimo = function() {
+            const nome = document.getElementById('nome-responsavel').value;
+            if (!nome) return alert("Digite o nome!");
+            const hoje = new Date();
+            const prox = new Date();
+            prox.setDate(hoje.getDate() + 90);
+
+            update(itemRef, {
+                status: "emprestado",
+                responsavel_atual: nome,
+                data_emprestimo: hoje.toISOString(),
+                proxima_verificacao: prox.toISOString(),
+                ultima_movimentacao: hoje.toLocaleDateString('pt-BR')
+            }).then(() => {
+                alert("Empréstimo realizado!");
+                location.reload();
+            });
         };
 
-        // 4. EXCLUIR EQUIPAMENTO
+        window.registrarDevolucao = function() {
+            update(itemRef, {
+                status: "disponivel",
+                responsavel_atual: "",
+                proxima_verificacao: null, // Limpa a verificação ao devolver
+                ultima_movimentacao: new Date().toLocaleDateString('pt-BR')
+            }).then(() => {
+                alert("Devolvido!");
+                location.reload();
+            });
+        };
+
+        window.confirmarTudoCerto = function() {
+            const novaData = new Date();
+            novaData.setDate(novaData.getDate() + 90);
+            update(itemRef, { proxima_verificacao: novaData.toISOString() })
+            .then(() => {
+                alert("Revisão confirmada!");
+                location.reload();
+            });
+        };
+
         window.deletarEquipamento = function() {
-            if (confirm("⚠️ TEM CERTEZA? Esta máquina será removida permanentemente do sistema.")) {
-                remove(itemRef)
-                    .then(() => {
-                        alert("Equipamento removido!");
-                        window.location.href = 'index.html';
-                    })
-                    .catch(error => alert("Erro ao excluir: " + error.message));
+            if (confirm("Excluir permanentemente?")) {
+                remove(itemRef).then(() => window.location.href = 'index.html');
             }
         };
 
     } else {
         window.location.href = 'index.html';
     }
+
+    window.abrirModalEmprestimo = function() {
+        const status = document.getElementById('det-status').innerText;
+        if (status === "EMPRESTADO") {
+            if(confirm("Registrar devolução?")) registrarDevolucao();
+        } else {
+            document.getElementById('modal-emprestimo').style.display = 'block';
+        }
+    };
+
+    window.fecharModal = function() {
+        document.getElementById('modal-emprestimo').style.display = 'none';
+    };
+
+    window.cancelarEdicao = function() { location.reload(); };
 </script>
 </body>
 </html>
